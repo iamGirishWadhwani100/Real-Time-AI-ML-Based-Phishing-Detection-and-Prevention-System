@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+httpx
+python-whois
+python-multipart
+Pillow
+stegano
+pyOpenSSL

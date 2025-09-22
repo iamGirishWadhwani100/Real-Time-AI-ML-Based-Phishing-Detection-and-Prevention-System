@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetherium Shield - Expanded Security Toolkit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tab { cursor: pointer; padding: 0.75rem 1rem; border-bottom: 2px solid transparent; transition: all 0.2s ease-in-out; white-space: nowrap; }
+        .tab.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+        .tool-panel { display: none; }
+        .tool-panel.active { display: block; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .result-box { background-color: rgba(17, 24, 39, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tabs-container { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .tabs-container::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen p-4">
+    <div class="w-full max-w-5xl mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-cyan-300">Aetherium Shield</h1>
+            <p class="text-gray-400 mt-2">Your Expanded Cybersecurity Toolkit</p>
+        </header>
+
+        <main class="glass-card rounded-2xl shadow-2xl">
+            <!-- Tabs Navigation -->
+            <div class="border-b border-gray-700 tabs-container">
+                <div class="flex space-x-2">
+                    <div class="tab active" onclick="showTool('urlScanner')"><i class="fas fa-shield-virus mr-2"></i>URL Scan</div>
+                    <div class="tab" onclick="showTool('fileScanner')"><i class="fas fa-file-shield mr-2"></i>File Scan</div>
+                    <div class="tab" onclick="showTool('domainChecker')"><i class="fas fa-id-card mr-2"></i>Domain Info</div>
+                    <div class="tab" onclick="showTool('sslAnalyzer')"><i class="fas fa-lock mr-2"></i>SSL Info</div>
+                    <div class="tab" onclick="showTool('contentAnalyzer')"><i class="fas fa-file-alt mr-2"></i>Text Scan</div>
+                    <div class="tab" onclick="showTool('emailAnalyzer')"><i class="fas fa-envelope-open-text mr-2"></i>Email Header</div>
+                    <div class="tab" onclick="showTool('passwordChecker')"><i class="fas fa-key mr-2"></i>Password Check</div>
+                    <div class="tab" onclick="showTool('hashGenerator')"><i class="fas fa-hashtag mr-2"></i>Hash Gen</div>
+                    <div class="tab" onclick="showTool('steganography')"><i class="fas fa-user-secret mr-2"></i>Steganography</div>
+                    <div class="tab" onclick="showTool('exifViewer')"><i class="fas fa-camera-retro mr-2"></i>EXIF Viewer</div>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <!-- URL Scanner Panel -->
+                <div id="urlScanner" class="tool-panel active">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">URL Real-Time Scanner</h2>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input id="urlScannerInput" type="text" placeholder="e.g., example.com" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <button onclick="handleUrlScan()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Scan</button>
+                    </div>
+                    <div id="urlScannerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+
+                <!-- File Scanner Panel -->
+                <div id="fileScanner" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">File Scanner (VirusTotal)</h2>
+                    <p class="text-gray-400 mb-4">Upload a file to check its hash against the VirusTotal database.</p>
+                     <div class="flex flex-col sm:flex-row gap-4 items-center">
+                        <input type="file" id="fileScannerInput" class="flex-grow text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
+                        <button onclick="handleFileScan()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Scan File</button>
+                    </div>
+                    <div id="fileScannerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+
+                <!-- Domain Checker Panel -->
+                <div id="domainChecker" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Domain Checker</h2>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input id="domainCheckerInput" type="text" placeholder="e.g., example.com" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <button onclick="handleDomainCheck()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Check</button>
+                    </div>
+                    <div id="domainCheckerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+
+                 <!-- SSL Analyzer Panel -->
+                <div id="sslAnalyzer" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">SSL/TLS Certificate Analyzer</h2>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input id="sslAnalyzerInput" type="text" placeholder="e.g., example.com" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <button onclick="handleSslAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Inspect</button>
+                    </div>
+                    <div id="sslAnalyzerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+                
+                <!-- Content Analyzer Panel -->
+                 <div id="contentAnalyzer" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Text Content Analyzer</h2>
+                    <div class="flex flex-col gap-4">
+                        <textarea id="contentAnalyzerInput" rows="8" placeholder="Paste suspicious text here..." class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+                        <button onclick="handleContentAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg self-start"><i class="fas fa-search mr-2"></i>Analyze Text</button>
+                    </div>
+                    <div id="contentAnalyzerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+
+                 <!-- Email Header Analyzer Panel -->
+                <div id="emailAnalyzer" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Email Header Analyzer</h2>
+                    <p class="text-gray-400 mb-4">Paste the full, raw email source (including headers) to check for spoofing indicators.</p>
+                     <div class="flex flex-col gap-4">
+                        <textarea id="emailAnalyzerInput" rows="8" placeholder="Paste full email source here..." class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+                        <button onclick="handleEmailAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg self-start"><i class="fas fa-search mr-2"></i>Analyze Headers</button>
+                    </div>
+                    <div id="emailAnalyzerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+
+                <!-- Password Checker Panel -->
+                <div id="passwordChecker" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Password Leak Checker</h2>
+                    <p class="text-gray-400 mb-4">Check if a password has appeared in a known data breach using the 'Have I Been Pwned' database.</p>
+                     <div class="flex flex-col sm:flex-row gap-4">
+                        <input id="passwordCheckerInput" type="password" placeholder="Enter a password to check" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <button onclick="handlePasswordCheck()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Check</button>
+                    </div>
+                    <div id="passwordCheckerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+                
+                <!-- Hash Generator Panel -->
+                <div id="hashGenerator" class="tool-panel">
+                     <h2 class="text-2xl font-bold text-sky-400 mb-4">Hash Generator</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <textarea id="hashTextInput" rows="4" placeholder="Enter text here..." class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2"></textarea>
+                            <input type="file" id="hashFileInput" class="mt-2 w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
+                        </div>
+                        <div>
+                            <select id="hashAlgo" class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2">
+                                <option>SHA256</option><option>SHA1</option><option>MD5</option>
+                            </select>
+                            <button onclick="handleHashGeneration()" class="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Generate Hash</button>
+                        </div>
+                    </div>
+                    <div id="hashGeneratorResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+
+                <!-- Steganography Panel -->
+                <div id="steganography" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Steganography Tool</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-gray-800/50 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-2">Hide Message</h3>
+                            <input type="file" id="stegoHideFile" accept="image/png" class="mb-2 w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
+                            <input id="stegoHideMessage" type="text" placeholder="Secret message..." class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2">
+                            <button onclick="handleStegoHide()" class="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Hide</button>
+                        </div>
+                        <div class="p-4 bg-gray-800/50 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-2">Reveal Message</h3>
+                            <input type="file" id="stegoRevealFile" accept="image/png" class="mb-2 w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
+                            <button onclick="handleStegoReveal()" class="w-full mt-12 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Reveal</button>
+                        </div>
+                    </div>
+                    <div id="steganographyResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+                
+                 <!-- EXIF Viewer Panel -->
+                <div id="exifViewer" class="tool-panel">
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Image EXIF Viewer</h2>
+                    <p class="text-gray-400 mb-4">Upload an image (JPG, TIFF) to view its hidden metadata.</p>
+                     <div class="flex flex-col sm:flex-row gap-4 items-center">
+                        <input type="file" id="exifViewerInput" accept="image/jpeg, image/tiff" class="flex-grow text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
+                        <button onclick="handleExifView()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>View EXIF</button>
+                    </div>
+                    <div id="exifViewerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
+                </div>
+
+            </div>
+        </main>
+        <footer class="text-center mt-8 text-gray-500 text-sm">
+            Aetherium Shield | Secure Backend Proxy
+        </footer>
+    </div>
+    
+    <script>
+        const BASE_URL = "http://127.0.0.1:8000/tools";
+
+        // --- UI Control ---
+        function showTool(toolId) {
+            document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(toolId).classList.add('active');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function showResult(containerId, content, isError = false) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = content;
+            container.classList.remove('hidden');
+            if(isError) {
+                container.classList.add('text-red-400', 'border-red-500');
+            } else {
+                container.classList.remove('text-red-400', 'border-red-500');
+            }
+        }
+
+        const loaderHTML = (text = 'Analyzing...') => `<div class="flex justify-center items-center"><div class="loader"></div><span class="ml-4">${text}</span></div>`;
+        const renderDict = (dict) => Object.entries(dict).map(([key, value]) => `<p class="ml-4"><span class="text-gray-400">${key}:</span> ${value}</p>`).join('');
+
+        // --- Tool Handlers ---
+        async function handleUrlScan() {
+            const url = document.getElementById('urlScannerInput').value;
+            const resultDiv = 'urlScannerResult';
+            if (!url) { showResult(resultDiv, 'Please enter a URL.', true); return; }
+            showResult(resultDiv, loaderHTML());
+            
+            try {
+                const response = await fetch(`${BASE_URL}/scan-url/?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail?.error?.message || JSON.stringify(data.detail));
+
+                const stats = data.data.attributes.last_analysis_stats;
+                let verdict = "Safe";
+                if (stats.malicious > 0) verdict = "Malicious";
+                else if (stats.suspicious > 0) verdict = "Suspicious";
+
+                const html = `<h3 class="font-bold text-lg">Verdict: ${verdict}</h3>
+                              <p>Malicious: ${stats.malicious} | Suspicious: ${stats.suspicious} | Harmless: ${stats.harmless}</p>`;
+                showResult(resultDiv, html);
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleDomainCheck() {
+            const url = document.getElementById('domainCheckerInput').value;
+            const resultDiv = 'domainCheckerResult';
+             if (!url) { showResult(resultDiv, 'Please enter a domain.', true); return; }
+            showResult(resultDiv, loaderHTML());
+
+            try {
+                 const response = await fetch(`${BASE_URL}/check-domain/?url=${encodeURIComponent(url)}`);
+                 const data = await response.json();
+                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
+                 
+                 const html = `<div class="font-mono text-sm">
+                                <p><span class="text-gray-400">Domain:</span> ${data.domain}</p>
+                                <p><span class="text-gray-400">Registrar:</span> ${data.registrar}</p>
+                                <p><span class="text-gray-400">Created:</span> ${new Date(data.creation_date).toDateString()}</p>
+                                <p><span class="text-gray-400">Expires:</span> ${new Date(data.expiration_date).toDateString()}</p>
+                              </div>`;
+                showResult(resultDiv, html);
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+        
+        async function handleContentAnalysis() {
+            const content = document.getElementById('contentAnalyzerInput').value;
+            const resultDiv = 'contentAnalyzerResult';
+             if (!content) { showResult(resultDiv, 'Please enter some text to analyze.', true); return; }
+            showResult(resultDiv, loaderHTML());
+             try {
+                 const response = await fetch(`${BASE_URL}/analyze-content/`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ text: content })
+                 });
+                 const data = await response.json();
+                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
+                 
+                 let keywordsText = data.suspicious_keywords_found.join(', ');
+                 if (!keywordsText) {
+                     keywordsText = '<span class="text-green-400">None found.</span>';
+                 }
+
+                 const html = `<p><span class="font-bold">Suspicious Keywords Found (${data.keyword_count}):</span> ${keywordsText}</p>`;
+                showResult(resultDiv, html);
+             } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleHashGeneration() {
+            const text = document.getElementById('hashTextInput').value;
+            const file = document.getElementById('hashFileInput').files[0];
+            const algo = document.getElementById('hashAlgo').value;
+            const resultDiv = 'hashGeneratorResult';
+            if (!text && !file) { showResult(resultDiv, 'Please enter text or select a file.', true); return; }
+            showResult(resultDiv, loaderHTML('Hashing...'));
+
+            const formData = new FormData();
+            formData.append('algorithm', algo);
+            if(file) formData.append('file', file);
+            else formData.append('text', text);
+
+            try {
+                const response = await fetch(`${BASE_URL}/hash/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
+                 const html = `<p class="font-bold">${data.algorithm} Hash:</p><p class="font-mono text-sky-300 break-all">${data.hash}</p>`;
+                 showResult(resultDiv, html);
+            } catch(error) {
+                 showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleStegoHide() {
+            const file = document.getElementById('stegoHideFile').files[0];
+            const message = document.getElementById('stegoHideMessage').value;
+            const resultDiv = 'steganographyResult';
+            if (!file || !message) { showResult(resultDiv, 'Please select a PNG file and enter a message.', true); return; }
+            showResult(resultDiv, loaderHTML('Hiding Message...'));
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('message', message);
+            
+            try {
+                const response = await fetch(`${BASE_URL}/steganography/hide/`, { method: 'POST', body: formData });
+                if (!response.ok) { const data = await response.json(); throw new Error(JSON.stringify(data.detail)); }
+                
+                const imageBlob = await response.blob();
+                const imageUrl = URL.createObjectURL(imageBlob);
+                const html = `<p class="font-bold">Message Hidden Successfully!</p>
+                              <img src="${imageUrl}" class="mt-2 rounded-lg max-w-xs mx-auto" />
+                              <a href="${imageUrl}" download="stego_image.png" class="inline-block mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Download Image</a>`;
+                showResult(resultDiv, html);
+
+            } catch(error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleStegoReveal() {
+            const file = document.getElementById('stegoRevealFile').files[0];
+            const resultDiv = 'steganographyResult';
+            if (!file) { showResult(resultDiv, 'Please select a PNG file.', true); return; }
+            showResult(resultDiv, loaderHTML('Revealing Message...'));
+
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${BASE_URL}/steganography/reveal/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
+                 const html = `<p class="font-bold">Revealed Message:</p><p class="font-mono text-sky-300">${data.message}</p>`;
+                 showResult(resultDiv, html);
+            } catch(error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleSslAnalysis() {
+            const url = document.getElementById('sslAnalyzerInput').value;
+            const resultDiv = 'sslAnalyzerResult';
+            if (!url) { showResult(resultDiv, 'Please enter a domain.', true); return; }
+            showResult(resultDiv, loaderHTML());
+
+            try {
+                const response = await fetch(`${BASE_URL}/analyze-ssl/?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(JSON.stringify(data.detail));
+                
+                const html = `<div class="font-mono text-sm space-y-2">
+                                <p><span class="text-gray-400">Domain:</span> ${data.domain}</p>
+                                <p class="font-bold mt-2">Subject:</p>
+                                ${renderDict(data.subject)}
+                                <p class="font-bold mt-2">Issuer:</p>
+                                ${renderDict(data.issuer)}
+                                <p><span class="text-gray-400">Valid From:</span> ${new Date(data.valid_from).toUTCString()}</p>
+                                <p><span class="text-gray-400">Valid To:</span> ${new Date(data.valid_to).toUTCString()}</p>
+                                <p><span class="text-gray-400">Expired:</span> <span class="${data.has_expired ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}">${data.has_expired}</span></p>
+                              </div>`;
+                showResult(resultDiv, html);
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleFileScan() {
+            const file = document.getElementById('fileScannerInput').files[0];
+            const resultDiv = 'fileScannerResult';
+            if (!file) { showResult(resultDiv, 'Please select a file.', true); return; }
+            showResult(resultDiv, loaderHTML('Scanning file hash...'));
+            
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${BASE_URL}/scan-file/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+
+                const stats = data.data.attributes.last_analysis_stats;
+                let verdict = "Clean";
+                let verdictColor = "text-green-400";
+                if (stats.malicious > 0) { verdict = "Malicious"; verdictColor = "text-red-500"; }
+                else if (stats.suspicious > 0) { verdict = "Suspicious"; verdictColor = "text-yellow-400"; }
+
+                const html = `<h3 class="font-bold text-lg">Verdict: <span class="${verdictColor}">${verdict}</span></h3>
+                              <p>Malicious: ${stats.malicious} | Suspicious: ${stats.suspicious} | Harmless: ${stats.harmless}</p>
+                              <p class="text-xs text-gray-400 mt-2">SHA256: ${data.data.attributes.sha256}</p>`;
+                showResult(resultDiv, html);
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleEmailAnalysis() {
+            const headers = document.getElementById('emailAnalyzerInput').value;
+            const resultDiv = 'emailAnalyzerResult';
+            if (!headers) { showResult(resultDiv, 'Please paste email headers.', true); return; }
+            showResult(resultDiv, loaderHTML('Analyzing headers...'));
+
+            try {
+                const response = await fetch(`${BASE_URL}/analyze-email-headers/`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ text: headers })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+
+                const getStatusClass = (status) => status.toLowerCase() === 'pass' ? 'text-green-400' : 'text-red-400';
+                const html = `<div class="font-mono text-sm space-y-1">
+                                <p><span class="text-gray-400">From:</span> ${data.from || 'N/A'}</p>
+                                <p><span class="text-gray-400">Subject:</span> ${data.subject || 'N/A'}</p>
+                                <p><span class="text-gray-400">Date:</span> ${data.date || 'N/A'}</p>
+                                <hr class="border-gray-600 my-2">
+                                <p><span class="text-gray-400">SPF:</span> <b class="${getStatusClass(data.spf)}">${data.spf}</b></p>
+                                <p><span class="text-gray-400">DKIM:</span> <b class="${getStatusClass(data.dkim)}">${data.dkim}</b></p>
+                                <p><span class="text-gray-400">DMARC:</span> <b class="${getStatusClass(data.dmarc)}">${data.dmarc}</b></p>
+                              </div>`;
+                showResult(resultDiv, html);
+            } catch (error) {
+                 showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handlePasswordCheck() {
+            const password = document.getElementById('passwordCheckerInput').value;
+            const resultDiv = 'passwordCheckerResult';
+            if (!password) { showResult(resultDiv, 'Please enter a password.', true); return; }
+            showResult(resultDiv, loaderHTML('Checking for leaks...'));
+
+             try {
+                const response = await fetch(`${BASE_URL}/check-password-leak/`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ password: password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+
+                let html;
+                if(data.pwned) {
+                    html = `<h3 class="text-2xl font-bold text-red-500">Oh no — pwned!</h3>
+                            <p class="mt-2">This password has been seen <b class="text-red-400">${data.count.toLocaleString()}</b> times before in data breaches.</p>
+                            <p class="text-sm text-gray-400">You should not use this password anywhere.</p>`;
+                } else {
+                    html = `<h3 class="text-2xl font-bold text-green-500">Good news — no pwnage found!</h3>
+                            <p class="mt-2">This password was not found in any of the data breaches known to HIBP.</p>`;
+                }
+                showResult(resultDiv, html);
+            } catch (error) {
+                 showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleExifView() {
+            const file = document.getElementById('exifViewerInput').files[0];
+            const resultDiv = 'exifViewerResult';
+            if (!file) { showResult(resultDiv, 'Please select an image file.', true); return; }
+            showResult(resultDiv, loaderHTML('Reading metadata...'));
+
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetch(`${BASE_URL}/view-exif/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+                
+                const html = `<div class="font-mono text-xs space-y-1 overflow-auto max-h-60">
+                                ${Object.entries(data).map(([key, value]) => `<p><span class="text-gray-400">${key}:</span> ${String(value).slice(0, 200)}</p>`).join('')}
+                              </div>`;
+                showResult(resultDiv, html);
+            } catch (error) {
+                 showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>
+
