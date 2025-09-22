@@ -14,6 +14,7 @@ from OpenSSL import crypto
 from datetime import datetime
 import email
 from email.header import decode_header
+import asyncio
 
 # --- Configuration ---
 # IMPORTANT: Replace with your actual VirusTotal API Key
@@ -51,18 +52,27 @@ async def scan_url(url: str):
     headers = {"x-apikey": VIRUSTOTAL_API_KEY}
     payload = {"url": url}
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # Step 1: Submit the URL for analysis
             post_response = await client.post(VT_URL_API, headers=headers, data=payload)
             post_response.raise_for_status()
             analysis_id = post_response.json()["data"]["id"]
             report_url = f"https://www.virustotal.com/api/v3/analyses/{analysis_id}"
             
-            # Poll for completion
-            while True:
+            # Step 2: Poll for the analysis report with a timeout
+            max_polls = 12
+            poll_interval = 5  # seconds
+            for _ in range(max_polls):
+                await asyncio.sleep(poll_interval)  # Wait before checking again
                 get_response = await client.get(report_url, headers=headers)
                 get_response.raise_for_status()
-                if get_response.json()['data']['attributes']['status'] == 'completed':
-                    return get_response.json()
+                result = get_response.json()
+                if result['data']['attributes']['status'] == 'completed':
+                    return result  # Success, return the completed report
+            
+            # If the loop finishes without a 'completed' status, the scan timed out
+            raise HTTPException(status_code=408, detail="URL scan timed out. The analysis is taking too long. Please try again later.")
+
     except httpx.HTTPStatusError as e:
         raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
     except Exception as e:
@@ -70,11 +80,27 @@ async def scan_url(url: str):
 
 @tools_router.get("/check-domain/")
 async def check_domain(url: str):
+    def run_whois(domain):
+        # This synchronous function will be run in a separate thread
+        return whois.whois(domain)
     try:
-        domain_info = whois.whois(url)
-        if not domain_info.registrar:
+        loop = asyncio.get_event_loop()
+        # Run the blocking whois call in an executor to prevent freezing the server
+        domain_info = await loop.run_in_executor(None, run_whois, url)
+
+        if not domain_info or not domain_info.registrar:
             raise ValueError("Could not retrieve WHOIS data. The domain may not exist or the data is private.")
-        return { "domain": url, "registrar": domain_info.registrar, "creation_date": domain_info.creation_date, "expiration_date": domain_info.expiration_date }
+        
+        # whois can return a list of dates, so we handle that case
+        creation_date = domain_info.creation_date[0] if isinstance(domain_info.creation_date, list) else domain_info.creation_date
+        expiration_date = domain_info.expiration_date[0] if isinstance(domain_info.expiration_date, list) else domain_info.expiration_date
+
+        return { 
+            "domain": url, 
+            "registrar": domain_info.registrar, 
+            "creation_date": creation_date, 
+            "expiration_date": expiration_date 
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
@@ -126,10 +152,10 @@ async def steganography_reveal(file: UploadFile = File(...)):
 
 @tools_router.get("/analyze-ssl/")
 async def analyze_ssl(url: str):
-    domain = url.split('//')[-1].split('/')[0]
+    domain = url.split('//')[-1].split('/')[0].split(':')[0]
     context = ssl.create_default_context()
     try:
-        with socket.create_connection((domain, 443)) as sock:
+        with socket.create_connection((domain, 443), timeout=5) as sock:
             with context.wrap_socket(sock, server_hostname=domain) as ssock:
                 cert_der = ssock.getpeercert(True)
                 cert = crypto.load_certificate(crypto.FILETYPE_ASN1, cert_der)
@@ -143,6 +169,10 @@ async def analyze_ssl(url: str):
                     "valid_to": datetime.strptime(cert.get_notAfter().decode(), '%Y%m%d%H%M%SZ'),
                     "has_expired": cert.has_expired()
                 }
+    except socket.timeout:
+        raise HTTPException(status_code=408, detail=f"Connection to {domain} timed out.")
+    except socket.gaierror:
+        raise HTTPException(status_code=400, detail=f"Could not resolve hostname: {domain}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not retrieve SSL certificate: {e}")
 
