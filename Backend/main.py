@@ -1,257 +1,301 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+import uvicorn
 import httpx
 import whois
 import hashlib
-from PIL import Image, ExifTags
-from stegano import lsb
 import io
 import ssl
 import socket
-from OpenSSL import crypto
-from datetime import datetime
-import email
-from email.header import decode_header
 import asyncio
+from datetime import datetime
 
-# --- Configuration ---
-# IMPORTANT: Replace with your actual VirusTotal API Key
-VIRUSTOTAL_API_KEY = "766decf12ad230dbab2b906fda620a76295f2ad4f675473615ff47d5a1ac7672"
-VT_URL_API = "https://www.virustotal.com/api/v3/urls"
-VT_FILE_API = "https://www.virustotal.com/api/v3/files"
-HIBP_API_URL = "https://api.pwnedpasswords.com/range"
+from fastapi import FastAPI, APIRouter, HTTPException, File, UploadFile, Form, Body
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from PIL import Image, ExifTags
+from stegano import lsb
+from OpenSSL import crypto
 
-# --- FastAPI App Initialization ---
+# --- App Initialization ---
 app = FastAPI(
     title="Aetherium Shield API",
-    description="Backend services for the Aetherium Shield Security Toolkit."
+    description="A multi-tool security analysis backend.",
+    version="1.0.0"
 )
 
-# --- CORS Middleware ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# --- Pydantic Models ---
-class TextPayload(BaseModel):
-    text: str
+tools_router = APIRouter()
+VIRUSTOTAL_API_KEY = "766decf12ad230dbab2b906fda620a76295f2ad4f675473615ff47d5a1ac7672" # Stored on the backend for security
 
-class PasswordPayload(BaseModel):
-    password: str
-
-# --- API Endpoints ---
-tools_router = FastAPI()
-
-# --- Existing Tools ---
-
-@tools_router.get("/scan-url/")
-async def scan_url(url: str):
-    headers = {"x-apikey": VIRUSTOTAL_API_KEY}
-    payload = {"url": url}
+# --- Helper Functions ---
+def get_domain_from_url(url: str) -> str:
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            # Step 1: Submit the URL for analysis
-            post_response = await client.post(VT_URL_API, headers=headers, data=payload)
-            post_response.raise_for_status()
-            analysis_id = post_response.json()["data"]["id"]
+        if "://" in url:
+            url = url.split('://')[1]
+        url = url.split('/')[0]
+        return url
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid URL format.")
+        
+# --- API Endpoints ---
+
+@tools_router.post("/scan-url/")
+async def analyze_url(url: str = Form(...)):
+    if not VIRUSTOTAL_API_KEY:
+        raise HTTPException(status_code=500, detail="VirusTotal API key is not configured.")
+    
+    vt_url_scan = "https://www.virustotal.com/api/v3/urls"
+    headers = {"x-apikey": VIRUSTOTAL_API_KEY}
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        try:
+            scan_payload = {"url": url}
+            scan_response = await client.post(vt_url_scan, headers=headers, data=scan_payload)
+            scan_response.raise_for_status()
+            analysis_id = scan_response.json()["data"]["id"]
+
             report_url = f"https://www.virustotal.com/api/v3/analyses/{analysis_id}"
             
-            # Step 2: Poll for the analysis report with a timeout
-            max_polls = 12
-            poll_interval = 5  # seconds
-            for _ in range(max_polls):
-                await asyncio.sleep(poll_interval)  # Wait before checking again
-                get_response = await client.get(report_url, headers=headers)
-                get_response.raise_for_status()
-                result = get_response.json()
-                if result['data']['attributes']['status'] == 'completed':
-                    return result  # Success, return the completed report
+            # Poll for the report
+            for _ in range(5): # Poll a few times
+                await asyncio.sleep(3)
+                report_response = await client.get(report_url, headers=headers)
+                report_response.raise_for_status()
+                report_data = report_response.json()
+                if report_data.get("data", {}).get("attributes", {}).get("status") == "completed":
+                    return report_data
             
-            # If the loop finishes without a 'completed' status, the scan timed out
-            raise HTTPException(status_code=408, detail="URL scan timed out. The analysis is taking too long. Please try again later.")
+            return {"detail": "Scan submitted, but analysis is taking longer than expected. Please check VirusTotal directly."}
 
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@tools_router.get("/check-domain/")
-async def check_domain(url: str):
-    def run_whois(domain):
-        # This synchronous function will be run in a separate thread
-        return whois.whois(domain)
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(status_code=e.response.status_code, detail=f"VirusTotal API error: {e.response.text}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+
+@tools_router.post("/check-domain/")
+async def check_domain(domain: str = Form(...)):
     try:
-        loop = asyncio.get_event_loop()
-        # Run the blocking whois call in an executor to prevent freezing the server
-        domain_info = await loop.run_in_executor(None, run_whois, url)
+        domain_info = whois.whois(domain)
 
-        if not domain_info or not domain_info.registrar:
-            raise ValueError("Could not retrieve WHOIS data. The domain may not exist or the data is private.")
+        creation_date = domain_info.creation_date
+        expiration_date = domain_info.expiration_date
+
+        if not creation_date:
+            return {"error": "Could not retrieve creation date for this domain. It might be a new or protected domain."}
         
-        # whois can return a list of dates, so we handle that case
-        creation_date = domain_info.creation_date[0] if isinstance(domain_info.creation_date, list) else domain_info.creation_date
-        expiration_date = domain_info.expiration_date[0] if isinstance(domain_info.expiration_date, list) else domain_info.expiration_date
+        # Handle cases where dates are returned as a list
+        if isinstance(creation_date, list):
+            creation_date = creation_date[0]
+        if isinstance(expiration_date, list):
+            expiration_date = expiration_date[0] if expiration_date else None
 
-        return { 
-            "domain": url, 
-            "registrar": domain_info.registrar, 
-            "creation_date": creation_date, 
-            "expiration_date": expiration_date 
+        age_days = (datetime.now() - creation_date).days if creation_date else -1
+        
+        return {
+            "domain_name": domain_info.domain_name,
+            "registrar": domain_info.registrar,
+            "creation_date": creation_date.strftime("%Y-%m-%d") if creation_date else "N/A",
+            "expiration_date": expiration_date.strftime("%Y-%m-%d") if expiration_date else "N/A",
+            "age_days": age_days
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Could not fetch WHOIS data. The domain may be invalid, private, or unsupported. Error: {e}")
 
 @tools_router.post("/analyze-content/")
-async def analyze_content(payload: TextPayload):
-    text = payload.text.lower()
-    keywords = [
-        'verify your account', 'password', 'urgent', 'account suspended', 'security alert', 'login', 'username', 
-        'credit card', 'confirm your identity', 'immediate action required', 'winner', 'congratulations', 'free', 'prize', 'invoice', 'payment'
-    ]
-    found = list(set([kw for kw in keywords if kw in text]))
-    return { "keyword_count": len(found), "suspicious_keywords_found": found }
+async def analyze_content(text: str = Form(...)):
+    flags = []
+    text_lower = text.lower()
+    if "urgent" in text_lower or "immediate" in text_lower or "action required" in text_lower:
+        flags.append("Urgency Detected")
+    if "verify your account" in text_lower or "update your details" in text_lower or "confirm your password" in text_lower:
+        flags.append("Credential Phishing Keywords")
+    if "account has been suspended" in text_lower or "unusual sign-in" in text_lower:
+        flags.append("Threat/Fear Mongering Language")
+    if "you have won" in text_lower or "congratulations" in text_lower:
+        flags.append("Suspicious Prize/Lottery Language")
+    
+    return {"flags": flags if flags else ["No immediate red flags detected."], "word_count": len(text.split())}
 
 @tools_router.post("/hash/")
-async def generate_hash(algorithm: str = Form(...), text: str = Form(None), file: UploadFile = File(None)):
+async def generate_hash(text: str = Form(None), file: UploadFile = File(None), algorithm: str = Form(...)):
     if not text and not file:
-        raise HTTPException(status_code=400, detail="Provide text or a file.")
-    hasher = hashlib.new(algorithm.lower())
-    if file:
-        while chunk := await file.read(8192): hasher.update(chunk)
-    else:
+        raise HTTPException(status_code=400, detail="Please provide either text or a file.")
+    if text and file:
+        raise HTTPException(status_code=400, detail="Please provide either text or a file, not both.")
+
+    hasher = hashlib.new(algorithm)
+    if text:
         hasher.update(text.encode())
-    return {"algorithm": algorithm, "hash": hasher.hexdigest()}
+    else:
+        contents = await file.read()
+        hasher.update(contents)
+    
+    return {"hash": hasher.hexdigest(), "algorithm": algorithm}
 
 @tools_router.post("/steganography/hide/")
-async def steganography_hide(file: UploadFile = File(...), message: str = Form(...)):
-    if not file.content_type.startswith("image/png"):
-        raise HTTPException(status_code=400, detail="Please upload a PNG.")
+async def stego_hide(file: UploadFile = File(...), message: str = Form(...)):
+    if not file.content_type == "image/png":
+        raise HTTPException(status_code=400, detail="Please upload a PNG file.")
+    
+    contents = await file.read()
     try:
-        secret_image = lsb.hide(io.BytesIO(await file.read()), message)
+        secret_img = lsb.hide(io.BytesIO(contents), message)
         buffer = io.BytesIO()
-        secret_image.save(buffer, "PNG")
+        secret_img.save(buffer, format="PNG")
         buffer.seek(0)
-        return StreamingResponse(buffer, media_type="image/png")
+        return StreamingResponse(buffer, media_type="image/png", headers={"Content-Disposition": "attachment; filename=stego_image.png"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to hide message: {e}")
 
+
 @tools_router.post("/steganography/reveal/")
-async def steganography_reveal(file: UploadFile = File(...)):
-    if not file.content_type.startswith("image/png"):
-        raise HTTPException(status_code=400, detail="Please upload a PNG.")
+async def stego_reveal(file: UploadFile = File(...)):
+    if not file.content_type == "image/png":
+        raise HTTPException(status_code=400, detail="Please upload a PNG file.")
+        
+    contents = await file.read()
     try:
-        message = lsb.reveal(io.BytesIO(await file.read()))
-        if not message:
-            raise HTTPException(status_code=404, detail="No hidden message found.")
-        return {"message": message}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to reveal message: {e}")
+        message = lsb.reveal(io.BytesIO(contents))
+        return {"message": message or "No hidden message found."}
+    except Exception:
+        return {"message": "No hidden message found or image is invalid."}
 
-@tools_router.get("/analyze-ssl/")
-async def analyze_ssl(url: str):
-    domain = url.split('//')[-1].split('/')[0].split(':')[0]
-    context = ssl.create_default_context()
+@tools_router.post("/analyze-certificate/")
+async def analyze_certificate(domain: str = Form(...)):
     try:
-        with socket.create_connection((domain, 443), timeout=5) as sock:
-            with context.wrap_socket(sock, server_hostname=domain) as ssock:
-                cert_der = ssock.getpeercert(True)
-                cert = crypto.load_certificate(crypto.FILETYPE_ASN1, cert_der)
-                subject = dict(cert.get_subject().get_components())
-                issuer = dict(cert.get_issuer().get_components())
-                return {
-                    "domain": domain,
-                    "subject": {k.decode(): v.decode() for k, v in subject.items()},
-                    "issuer": {k.decode(): v.decode() for k, v in issuer.items()},
-                    "valid_from": datetime.strptime(cert.get_notBefore().decode(), '%Y%m%d%H%M%SZ'),
-                    "valid_to": datetime.strptime(cert.get_notAfter().decode(), '%Y%m%d%H%M%SZ'),
-                    "has_expired": cert.has_expired()
-                }
-    except socket.timeout:
-        raise HTTPException(status_code=408, detail=f"Connection to {domain} timed out.")
-    except socket.gaierror:
-        raise HTTPException(status_code=400, detail=f"Could not resolve hostname: {domain}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not retrieve SSL certificate: {e}")
-
-# --- New Tools ---
-
-@tools_router.post("/analyze-email-headers/")
-async def analyze_email_headers(payload: TextPayload):
-    try:
-        headers = email.message_from_string(payload.text)
-        auth_results = headers.get("Authentication-Results", "Not found")
-        spf, dkim, dmarc = "Not found", "Not found", "Not found"
-        if "spf=" in auth_results: spf = auth_results.split("spf=")[1].split(" ")[0]
-        if "dkim=" in auth_results: dkim = auth_results.split("dkim=")[1].split(" ")[0]
-        if "dmarc=" in auth_results: dmarc = auth_results.split("dmarc=")[1].split(" ")[0]
+        ctx = ssl.create_default_context()
+        with ctx.wrap_socket(socket.socket(), server_hostname=domain) as s:
+            s.connect((domain, 443))
+            cert_der = s.getpeercert(True)
+        
+        cert = crypto.load_certificate(crypto.FILETYPE_ASN1, cert_der)
+        
+        issuer = dict(cert.get_issuer().get_components())
+        subject = dict(cert.get_subject().get_components())
         
         return {
-            "from": headers.get("From"),
-            "subject": headers.get("Subject"),
-            "to": headers.get("To"),
-            "date": headers.get("Date"),
-            "spf": spf, "dkim": dkim, "dmarc": dmarc
+            "issuer": issuer.get(b'O', b'N/A').decode(),
+            "subject": subject.get(b'CN', b'N/A').decode(),
+            "serial_number": str(cert.get_serial_number()),
+            "valid_from": datetime.strptime(cert.get_notBefore().decode('ascii'), '%Y%m%d%H%M%SZ').strftime('%Y-%m-%d'),
+            "valid_until": datetime.strptime(cert.get_notAfter().decode('ascii'), '%Y%m%d%H%M%SZ').strftime('%Y-%m-%d'),
+            "is_expired": cert.has_expired()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to parse headers: {e}")
+        raise HTTPException(status_code=400, detail=f"Could not retrieve SSL certificate. Error: {e}")
 
 @tools_router.post("/scan-file/")
 async def scan_file(file: UploadFile = File(...)):
-    try:
-        file_bytes = await file.read()
-        file_hash = hashlib.sha256(file_bytes).hexdigest()
-        
-        headers = {"x-apikey": VIRUSTOTAL_API_KEY}
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{VT_FILE_API}/{file_hash}", headers=headers)
+    file_hash = hashlib.sha256(await file.read()).hexdigest()
+    url = f"https://www.virustotal.com/api/v3/files/{file_hash}"
+    headers = {"x-apikey": VIRUSTOTAL_API_KEY}
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        try:
+            response = await client.get(url, headers=headers)
             if response.status_code == 404:
-                # If not found, we would normally upload it. For this tool, we'll just report 'not found'.
-                 raise HTTPException(status_code=404, detail="File hash not found in VirusTotal database. Upload functionality not implemented in this version.")
+                return {
+                    "status": "not_found",
+                    "detail": "This file is not in the VirusTotal database. This means it is not a known threat, but it has not been scanned before."
+                }
             response.raise_for_status()
             return response.json()
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(status_code=e.response.status_code, detail=f"VirusTotal API error: {e.response.text}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+@tools_router.post("/analyze-email-headers/")
+async def analyze_email_headers(data: dict = Body(...)):
+    text = data.get("text", "")
+    headers = {}
+    spf = dkim = dmarc = "Not Found"
+    for line in text.splitlines():
+        if ":" in line:
+            key, value = line.split(":", 1)
+            headers[key.lower()] = value.strip()
+        if line.lower().startswith("authentication-results"):
+            if "spf=pass" in line.lower(): spf = "Pass"
+            elif "spf=fail" in line.lower(): spf = "Fail"
+            if "dkim=pass" in line.lower(): dkim = "Pass"
+            elif "dkim=fail" in line.lower(): dkim = "Fail"
+            if "dmarc=pass" in line.lower(): dmarc = "Pass"
+            elif "dmarc=fail" in line.lower(): dmarc = "Fail"
+    
+    return {
+        "from": headers.get("from", "N/A"),
+        "subject": headers.get("subject", "N/A"),
+        "date": headers.get("date", "N/A"),
+        "spf": spf,
+        "dkim": dkim,
+        "dmarc": dmarc
+    }
 
 @tools_router.post("/check-password-leak/")
-async def check_password_leak(payload: PasswordPayload):
-    try:
-        sha1_hash = hashlib.sha1(payload.password.encode()).hexdigest().upper()
-        prefix, suffix = sha1_hash[:5], sha1_hash[5:]
-        
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{HIBP_API_URL}/{prefix}")
+async def check_password_leak(data: dict = Body(...)):
+    password = data.get("password", "")
+    sha1_password = hashlib.sha1(password.encode()).hexdigest().upper()
+    prefix, suffix = sha1_password[:5], sha1_password[5:]
+    
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url)
             response.raise_for_status()
-        
-        hashes = (line.split(":") for line in response.text.splitlines())
-        for h, count in hashes:
-            if h == suffix:
-                return {"pwned": True, "count": int(count)}
-        return {"pwned": False, "count": 0}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+            hashes = (line.split(":") for line in response.text.splitlines())
+            for h, count in hashes:
+                if h == suffix:
+                    return {"pwned": True, "count": int(count)}
+            return {"pwned": False, "count": 0}
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(status_code=e.response.status_code, detail=f"HIBP API error: {e.response.text}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
 @tools_router.post("/view-exif/")
 async def view_exif(file: UploadFile = File(...)):
     try:
-        img = Image.open(file.file)
+        contents = await file.read()
+        img = Image.open(io.BytesIO(contents))
+        
+        metadata = {
+            "Filename": file.filename,
+            "File Size (bytes)": len(contents),
+            "Image Format": img.format,
+            "Image Mode": img.mode,
+            "Dimensions": f"{img.width}x{img.height}"
+        }
+
         exif_data = img._getexif()
         if not exif_data:
-            raise HTTPException(status_code=404, detail="No EXIF data found in this image.")
-        
-        decoded_exif = {ExifTags.TAGS.get(tag_id, tag_id): value for tag_id, value in exif_data.items()}
-        # Clean up non-serializable bytes
-        for key, val in decoded_exif.items():
+            metadata["EXIF Status"] = "No EXIF metadata found in this image."
+            return metadata
+            
+        exif = {ExifTags.TAGS[k]: v for k, v in exif_data.items() if k in ExifTags.TAGS}
+        for key, val in exif.items():
             if isinstance(val, bytes):
-                decoded_exif[key] = val.decode(errors='ignore')
+                exif[key] = val.decode(errors='ignore')
+        
+        # Combine basic metadata with detailed EXIF data
+        metadata.update(exif)
+        return metadata
 
-        return decoded_exif
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not read EXIF data: {e}")
+    except Exception:
+        return {"message": "Could not process image. It may not have EXIF data or is not a supported format (like JPG)."}
 
+
+# --- Mount Router ---
 app.include_router(tools_router, prefix="/tools")
+
+# --- Run App (for local development) ---
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
 

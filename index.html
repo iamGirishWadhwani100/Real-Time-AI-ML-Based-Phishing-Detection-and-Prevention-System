@@ -51,7 +51,7 @@
                     <h2 class="text-2xl font-bold text-sky-400 mb-4">URL Real-Time Scanner</h2>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <input id="urlScannerInput" type="text" placeholder="e.g., example.com" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                        <button onclick="handleUrlScan()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Scan</button>
+                        <button type="button" onclick="handleUrlScan()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Scan</button>
                     </div>
                     <div id="urlScannerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -62,7 +62,7 @@
                     <p class="text-gray-400 mb-4">Upload a file to check its hash against the VirusTotal database.</p>
                      <div class="flex flex-col sm:flex-row gap-4 items-center">
                         <input type="file" id="fileScannerInput" class="flex-grow text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
-                        <button onclick="handleFileScan()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Scan File</button>
+                        <button type="button" onclick="handleFileScan()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Scan File</button>
                     </div>
                     <div id="fileScannerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -72,7 +72,7 @@
                     <h2 class="text-2xl font-bold text-sky-400 mb-4">Domain Checker</h2>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <input id="domainCheckerInput" type="text" placeholder="e.g., example.com" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                        <button onclick="handleDomainCheck()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Check</button>
+                        <button type="button" onclick="handleDomainCheck()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Check</button>
                     </div>
                     <div id="domainCheckerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -82,7 +82,7 @@
                     <h2 class="text-2xl font-bold text-sky-400 mb-4">SSL/TLS Certificate Analyzer</h2>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <input id="sslAnalyzerInput" type="text" placeholder="e.g., example.com" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                        <button onclick="handleSslAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Inspect</button>
+                        <button type="button" onclick="handleSslAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Inspect</button>
                     </div>
                     <div id="sslAnalyzerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -92,7 +92,7 @@
                     <h2 class="text-2xl font-bold text-sky-400 mb-4">Text Content Analyzer</h2>
                     <div class="flex flex-col gap-4">
                         <textarea id="contentAnalyzerInput" rows="8" placeholder="Paste suspicious text here..." class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
-                        <button onclick="handleContentAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg self-start"><i class="fas fa-search mr-2"></i>Analyze Text</button>
+                        <button type="button" onclick="handleContentAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg self-start"><i class="fas fa-search mr-2"></i>Analyze Text</button>
                     </div>
                     <div id="contentAnalyzerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -103,7 +103,7 @@
                     <p class="text-gray-400 mb-4">Paste the full, raw email source (including headers) to check for spoofing indicators.</p>
                      <div class="flex flex-col gap-4">
                         <textarea id="emailAnalyzerInput" rows="8" placeholder="Paste full email source here..." class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
-                        <button onclick="handleEmailAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg self-start"><i class="fas fa-search mr-2"></i>Analyze Headers</button>
+                        <button type="button" onclick="handleEmailAnalysis()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg self-start"><i class="fas fa-search mr-2"></i>Analyze Headers</button>
                     </div>
                     <div id="emailAnalyzerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -114,7 +114,7 @@
                     <p class="text-gray-400 mb-4">Check if a password has appeared in a known data breach using the 'Have I Been Pwned' database.</p>
                      <div class="flex flex-col sm:flex-row gap-4">
                         <input id="passwordCheckerInput" type="password" placeholder="Enter a password to check" class="flex-grow bg-gray-800 border-2 border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                        <button onclick="handlePasswordCheck()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Check</button>
+                        <button type="button" onclick="handlePasswordCheck()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>Check</button>
                     </div>
                     <div id="passwordCheckerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -131,7 +131,7 @@
                             <select id="hashAlgo" class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2">
                                 <option>SHA256</option><option>SHA1</option><option>MD5</option>
                             </select>
-                            <button onclick="handleHashGeneration()" class="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Generate Hash</button>
+                            <button type="button" onclick="handleHashGeneration()" class="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Generate Hash</button>
                         </div>
                     </div>
                     <div id="hashGeneratorResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
@@ -145,12 +145,12 @@
                             <h3 class="text-lg font-semibold mb-2">Hide Message</h3>
                             <input type="file" id="stegoHideFile" accept="image/png" class="mb-2 w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
                             <input id="stegoHideMessage" type="text" placeholder="Secret message..." class="w-full bg-gray-800 border-2 border-gray-700 rounded-lg p-2">
-                            <button onclick="handleStegoHide()" class="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Hide</button>
+                            <button type="button" onclick="handleStegoHide()" class="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Hide & Download</button>
                         </div>
                         <div class="p-4 bg-gray-800/50 rounded-lg">
                             <h3 class="text-lg font-semibold mb-2">Reveal Message</h3>
                             <input type="file" id="stegoRevealFile" accept="image/png" class="mb-2 w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
-                            <button onclick="handleStegoReveal()" class="w-full mt-12 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Reveal</button>
+                            <button type="button" onclick="handleStegoReveal()" class="w-full mt-12 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg">Reveal</button>
                         </div>
                     </div>
                     <div id="steganographyResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
@@ -158,11 +158,11 @@
                 
                  <!-- EXIF Viewer Panel -->
                 <div id="exifViewer" class="tool-panel">
-                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Image EXIF Viewer</h2>
-                    <p class="text-gray-400 mb-4">Upload an image (JPG, TIFF) to view its hidden metadata.</p>
+                    <h2 class="text-2xl font-bold text-sky-400 mb-4">Image EXIF & Metadata Viewer</h2>
+                    <p class="text-gray-400 mb-4">Upload an image (JPG, TIFF) to view its hidden EXIF data and file metadata.</p>
                      <div class="flex flex-col sm:flex-row gap-4 items-center">
                         <input type="file" id="exifViewerInput" accept="image/jpeg, image/tiff" class="flex-grow text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-sky-900 file:text-sky-300 hover:file:bg-sky-800">
-                        <button onclick="handleExifView()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>View EXIF</button>
+                        <button type="button" onclick="handleExifView()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg"><i class="fas fa-search mr-2"></i>View Data</button>
                     </div>
                     <div id="exifViewerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
@@ -175,9 +175,10 @@
     </div>
     
     <script>
+        // --- Core Functions ---
         const BASE_URL = "http://127.0.0.1:8000/tools";
+        const loaderHTML = (text = 'Analyzing...') => `<div class="flex justify-center items-center"><div class="loader"></div><span class="ml-4">${text}</span></div>`;
 
-        // --- UI Control ---
         function showTool(toolId) {
             document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
             document.getElementById(toolId).classList.add('active');
@@ -189,86 +190,91 @@
             const container = document.getElementById(containerId);
             container.innerHTML = content;
             container.classList.remove('hidden');
-            if(isError) {
-                container.classList.add('text-red-400', 'border-red-500');
-            } else {
-                container.classList.remove('text-red-400', 'border-red-500');
-            }
+            container.classList.toggle('text-red-400', isError);
+            container.classList.toggle('border-red-500', isError);
         }
 
-        const loaderHTML = (text = 'Analyzing...') => `<div class="flex justify-center items-center"><div class="loader"></div><span class="ml-4">${text}</span></div>`;
-        const renderDict = (dict) => Object.entries(dict).map(([key, value]) => `<p class="ml-4"><span class="text-gray-400">${key}:</span> ${value}</p>`).join('');
+        function renderDict(data) {
+            let html = '<div class="font-mono text-xs space-y-1">';
+            for (const [key, value] of Object.entries(data)) {
+                html += `<p><span class="text-gray-400">${key}:</span> ${value}</p>`;
+            }
+            html += '</div>';
+            return html;
+        }
 
         // --- Tool Handlers ---
+        
         async function handleUrlScan() {
             const url = document.getElementById('urlScannerInput').value;
             const resultDiv = 'urlScannerResult';
             if (!url) { showResult(resultDiv, 'Please enter a URL.', true); return; }
-            showResult(resultDiv, loaderHTML());
-            
+            showResult(resultDiv, loaderHTML('Scanning URL...'));
+
+            const formData = new FormData();
+            formData.append('url', url);
+
             try {
-                const response = await fetch(`${BASE_URL}/scan-url/?url=${encodeURIComponent(url)}`);
+                const response = await fetch(`${BASE_URL}/scan-url/`, { method: 'POST', body: formData });
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.detail?.error?.message || JSON.stringify(data.detail));
+                if (!response.ok) throw new Error(data.detail);
 
-                const stats = data.data.attributes.last_analysis_stats;
-                let verdict = "Safe";
-                if (stats.malicious > 0) verdict = "Malicious";
-                else if (stats.suspicious > 0) verdict = "Suspicious";
-
-                const html = `<h3 class="font-bold text-lg">Verdict: ${verdict}</h3>
-                              <p>Malicious: ${stats.malicious} | Suspicious: ${stats.suspicious} | Harmless: ${stats.harmless}</p>`;
-                showResult(resultDiv, html);
+                // Defensive check for expected structure
+                if (data && data.data && data.data.attributes && data.data.attributes.stats) {
+                    const stats = data.data.attributes.stats;
+                    let verdict = "Clean";
+                    let verdictColor = "text-green-400";
+                    if (stats.malicious > 0) { verdict = "Malicious"; verdictColor = "text-red-500"; }
+                    else if (stats.suspicious > 0) { verdict = "Suspicious"; verdictColor = "text-yellow-400"; }
+                    
+                    const html = `<h3 class="font-bold text-lg">Verdict: <span class="${verdictColor}">${verdict}</span></h3>
+                                  <p>Malicious: ${stats.malicious} | Suspicious: ${stats.suspicious} | Harmless: ${stats.harmless}</p>`;
+                    showResult(resultDiv, html);
+                } else {
+                     showResult(resultDiv, 'Could not retrieve a valid scan report. The analysis may still be in progress.', true);
+                }
             } catch (error) {
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
 
         async function handleDomainCheck() {
-            const url = document.getElementById('domainCheckerInput').value;
+            const domain = document.getElementById('domainCheckerInput').value;
             const resultDiv = 'domainCheckerResult';
-             if (!url) { showResult(resultDiv, 'Please enter a domain.', true); return; }
-            showResult(resultDiv, loaderHTML());
+            if (!domain) { showResult(resultDiv, 'Please enter a domain.', true); return; }
+            showResult(resultDiv, loaderHTML('Checking domain...'));
+
+            const formData = new FormData();
+            formData.append('domain', domain);
 
             try {
-                 const response = await fetch(`${BASE_URL}/check-domain/?url=${encodeURIComponent(url)}`);
-                 const data = await response.json();
-                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
-                 
-                 const html = `<div class="font-mono text-sm">
-                                <p><span class="text-gray-400">Domain:</span> ${data.domain}</p>
-                                <p><span class="text-gray-400">Registrar:</span> ${data.registrar}</p>
-                                <p><span class="text-gray-400">Created:</span> ${new Date(data.creation_date).toDateString()}</p>
-                                <p><span class="text-gray-400">Expires:</span> ${new Date(data.expiration_date).toDateString()}</p>
-                              </div>`;
-                showResult(resultDiv, html);
+                const response = await fetch(`${BASE_URL}/check-domain/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+                if (data.error) throw new Error(data.error);
+                showResult(resultDiv, renderDict(data));
             } catch (error) {
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
         
         async function handleContentAnalysis() {
-            const content = document.getElementById('contentAnalyzerInput').value;
+            const text = document.getElementById('contentAnalyzerInput').value;
             const resultDiv = 'contentAnalyzerResult';
-             if (!content) { showResult(resultDiv, 'Please enter some text to analyze.', true); return; }
-            showResult(resultDiv, loaderHTML());
-             try {
-                 const response = await fetch(`${BASE_URL}/analyze-content/`, {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify({ text: content })
-                 });
-                 const data = await response.json();
-                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
-                 
-                 let keywordsText = data.suspicious_keywords_found.join(', ');
-                 if (!keywordsText) {
-                     keywordsText = '<span class="text-green-400">None found.</span>';
-                 }
+            if (!text) { showResult(resultDiv, 'Please enter text to analyze.', true); return; }
+            showResult(resultDiv, loaderHTML('Analyzing text...'));
 
-                 const html = `<p><span class="font-bold">Suspicious Keywords Found (${data.keyword_count}):</span> ${keywordsText}</p>`;
+            const formData = new FormData();
+            formData.append('text', text);
+            try {
+                const response = await fetch(`${BASE_URL}/analyze-content/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+                 const html = `<p><span class="text-gray-400">Word Count:</span> ${data.word_count}</p>
+                              <p class="mt-2"><span class="text-gray-400">Flags:</span></p>
+                              <ul class="list-disc list-inside">${data.flags.map(f => `<li>${f}</li>`).join('')}</ul>`;
                 showResult(resultDiv, html);
-             } catch (error) {
+            } catch (error) {
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
@@ -278,99 +284,96 @@
             const file = document.getElementById('hashFileInput').files[0];
             const algo = document.getElementById('hashAlgo').value;
             const resultDiv = 'hashGeneratorResult';
-            if (!text && !file) { showResult(resultDiv, 'Please enter text or select a file.', true); return; }
-            showResult(resultDiv, loaderHTML('Hashing...'));
 
+            if (!text && !file) { showResult(resultDiv, 'Please enter text or select a file.', true); return; }
+            showResult(resultDiv, loaderHTML('Generating hash...'));
+            
             const formData = new FormData();
             formData.append('algorithm', algo);
+            if(text) formData.append('text', text);
             if(file) formData.append('file', file);
-            else formData.append('text', text);
-
+            
             try {
                 const response = await fetch(`${BASE_URL}/hash/`, { method: 'POST', body: formData });
                 const data = await response.json();
-                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
-                 const html = `<p class="font-bold">${data.algorithm} Hash:</p><p class="font-mono text-sky-300 break-all">${data.hash}</p>`;
-                 showResult(resultDiv, html);
-            } catch(error) {
-                 showResult(resultDiv, `Error: ${error.message}`, true);
-            }
-        }
-
-        async function handleStegoHide() {
-            const file = document.getElementById('stegoHideFile').files[0];
-            const message = document.getElementById('stegoHideMessage').value;
-            const resultDiv = 'steganographyResult';
-            if (!file || !message) { showResult(resultDiv, 'Please select a PNG file and enter a message.', true); return; }
-            showResult(resultDiv, loaderHTML('Hiding Message...'));
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('message', message);
-            
-            try {
-                const response = await fetch(`${BASE_URL}/steganography/hide/`, { method: 'POST', body: formData });
-                if (!response.ok) { const data = await response.json(); throw new Error(JSON.stringify(data.detail)); }
-                
-                const imageBlob = await response.blob();
-                const imageUrl = URL.createObjectURL(imageBlob);
-                const html = `<p class="font-bold">Message Hidden Successfully!</p>
-                              <img src="${imageUrl}" class="mt-2 rounded-lg max-w-xs mx-auto" />
-                              <a href="${imageUrl}" download="stego_image.png" class="inline-block mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Download Image</a>`;
-                showResult(resultDiv, html);
-
-            } catch(error) {
-                showResult(resultDiv, `Error: ${error.message}`, true);
-            }
-        }
-
-        async function handleStegoReveal() {
-            const file = document.getElementById('stegoRevealFile').files[0];
-            const resultDiv = 'steganographyResult';
-            if (!file) { showResult(resultDiv, 'Please select a PNG file.', true); return; }
-            showResult(resultDiv, loaderHTML('Revealing Message...'));
-
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            try {
-                const response = await fetch(`${BASE_URL}/steganography/reveal/`, { method: 'POST', body: formData });
-                const data = await response.json();
-                 if (!response.ok) throw new Error(JSON.stringify(data.detail));
-                 const html = `<p class="font-bold">Revealed Message:</p><p class="font-mono text-sky-300">${data.message}</p>`;
-                 showResult(resultDiv, html);
-            } catch(error) {
-                showResult(resultDiv, `Error: ${error.message}`, true);
-            }
-        }
-
-        async function handleSslAnalysis() {
-            const url = document.getElementById('sslAnalyzerInput').value;
-            const resultDiv = 'sslAnalyzerResult';
-            if (!url) { showResult(resultDiv, 'Please enter a domain.', true); return; }
-            showResult(resultDiv, loaderHTML());
-
-            try {
-                const response = await fetch(`${BASE_URL}/analyze-ssl/?url=${encodeURIComponent(url)}`);
-                const data = await response.json();
-                if (!response.ok) throw new Error(JSON.stringify(data.detail));
-                
-                const html = `<div class="font-mono text-sm space-y-2">
-                                <p><span class="text-gray-400">Domain:</span> ${data.domain}</p>
-                                <p class="font-bold mt-2">Subject:</p>
-                                ${renderDict(data.subject)}
-                                <p class="font-bold mt-2">Issuer:</p>
-                                ${renderDict(data.issuer)}
-                                <p><span class="text-gray-400">Valid From:</span> ${new Date(data.valid_from).toUTCString()}</p>
-                                <p><span class="text-gray-400">Valid To:</span> ${new Date(data.valid_to).toUTCString()}</p>
-                                <p><span class="text-gray-400">Expired:</span> <span class="${data.has_expired ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}">${data.has_expired}</span></p>
-                              </div>`;
-                showResult(resultDiv, html);
+                if (!response.ok) throw new Error(data.detail);
+                showResult(resultDiv, `<p class="font-mono text-sm break-all">${data.algorithm}: ${data.hash}</p>`);
             } catch (error) {
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
+        
+        async function handleStegoHide() {
+            const file = document.getElementById('stegoHideFile').files[0];
+            const message = document.getElementById('stegoHideMessage').value;
+            const resultDiv = 'steganographyResult';
+            if (!file || !message) { showResult(resultDiv, 'Please select a PNG and enter a message to hide.', true); return; }
+            showResult(resultDiv, loaderHTML('Hiding message...'));
 
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('message', message);
+            try {
+                const response = await fetch(`${BASE_URL}/steganography/hide/`, { method: 'POST', body: formData });
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail);
+                }
+
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadUrl;
+                a.download = 'stego_image.png';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                a.remove();
+                
+                showResult(resultDiv, `<p class="text-green-400">Image with hidden message downloaded successfully.</p>`);
+
+            } catch (error) {
+                 showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+        
+        async function handleStegoReveal() {
+            const file = document.getElementById('stegoRevealFile').files[0];
+            const resultDiv = 'steganographyResult';
+            if (!file) { showResult(resultDiv, 'Please select a PNG to reveal the message from.', true); return; }
+            showResult(resultDiv, loaderHTML('Revealing message...'));
+            
+            const formData = new FormData();
+            formData.append('file', file);
+             try {
+                const response = await fetch(`${BASE_URL}/steganography/reveal/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+                showResult(resultDiv, `<p><span class="text-gray-400">Revealed Message:</span> ${data.message}</p>`);
+            } catch (error) {
+                 showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+
+        async function handleSslAnalysis() {
+            const domain = document.getElementById('sslAnalyzerInput').value;
+            const resultDiv = 'sslAnalyzerResult';
+            if (!domain) { showResult(resultDiv, 'Please enter a domain.', true); return; }
+            showResult(resultDiv, loaderHTML('Analyzing certificate...'));
+
+            const formData = new FormData();
+            formData.append('domain', domain);
+            try {
+                const response = await fetch(`${BASE_URL}/analyze-certificate/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+                showResult(resultDiv, renderDict(data));
+            } catch (error) {
+                showResult(resultDiv, `Error: ${error.message}`, true);
+            }
+        }
+        
         async function handleFileScan() {
             const file = document.getElementById('fileScannerInput').files[0];
             const resultDiv = 'fileScannerResult';
@@ -383,18 +386,28 @@
             try {
                 const response = await fetch(`${BASE_URL}/scan-file/`, { method: 'POST', body: formData });
                 const data = await response.json();
+                if (data.status === "not_found") {
+                     const html = `<h3 class="font-bold text-lg text-yellow-400">File Not Found in Database</h3>
+                                  <p>${data.detail}</p>`;
+                    showResult(resultDiv, html);
+                    return;
+                }
                 if (!response.ok) throw new Error(data.detail);
 
-                const stats = data.data.attributes.last_analysis_stats;
-                let verdict = "Clean";
-                let verdictColor = "text-green-400";
-                if (stats.malicious > 0) { verdict = "Malicious"; verdictColor = "text-red-500"; }
-                else if (stats.suspicious > 0) { verdict = "Suspicious"; verdictColor = "text-yellow-400"; }
+                if (data && data.data && data.data.attributes && data.data.attributes.last_analysis_stats) {
+                    const stats = data.data.attributes.last_analysis_stats;
+                    let verdict = "Clean";
+                    let verdictColor = "text-green-400";
+                    if (stats.malicious > 0) { verdict = "Malicious"; verdictColor = "text-red-500"; }
+                    else if (stats.suspicious > 0) { verdict = "Suspicious"; verdictColor = "text-yellow-400"; }
 
-                const html = `<h3 class="font-bold text-lg">Verdict: <span class="${verdictColor}">${verdict}</span></h3>
-                              <p>Malicious: ${stats.malicious} | Suspicious: ${stats.suspicious} | Harmless: ${stats.harmless}</p>
-                              <p class="text-xs text-gray-400 mt-2">SHA256: ${data.data.attributes.sha256}</p>`;
-                showResult(resultDiv, html);
+                    const html = `<h3 class="font-bold text-lg">Verdict: <span class="${verdictColor}">${verdict}</span></h3>
+                                  <p>Malicious: ${stats.malicious} | Suspicious: ${stats.suspicious} | Harmless: ${stats.harmless}</p>
+                                  <p class="text-xs text-gray-400 mt-2">SHA256: ${data.data.attributes.sha256}</p>`;
+                    showResult(resultDiv, html);
+                } else {
+                     showResult(resultDiv, 'Could not retrieve a valid scan report for this file.', true);
+                }
             } catch (error) {
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
@@ -473,6 +486,11 @@
                 const response = await fetch(`${BASE_URL}/view-exif/`, { method: 'POST', body: formData });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.detail);
+                
+                if (data.message) {
+                    showResult(resultDiv, `<p>${data.message}</p>`);
+                    return;
+                }
                 
                 const html = `<div class="font-mono text-xs space-y-1 overflow-auto max-h-60">
                                 ${Object.entries(data).map(([key, value]) => `<p><span class="text-gray-400">${key}:</span> ${String(value).slice(0, 200)}</p>`).join('')}
