@@ -86,7 +86,7 @@
                     </div>
                     <div id="sslAnalyzerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
-                
+
                 <!-- Content Analyzer Panel -->
                  <div id="contentAnalyzer" class="tool-panel">
                     <h2 class="text-2xl font-bold text-sky-400 mb-4">Text Content Analyzer</h2>
@@ -118,7 +118,7 @@
                     </div>
                     <div id="passwordCheckerResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
-                
+
                 <!-- Hash Generator Panel -->
                 <div id="hashGenerator" class="tool-panel">
                      <h2 class="text-2xl font-bold text-sky-400 mb-4">Hash Generator</h2>
@@ -155,7 +155,7 @@
                     </div>
                     <div id="steganographyResult" class="mt-6 result-box rounded-lg p-4 hidden"></div>
                 </div>
-                
+
                  <!-- EXIF Viewer Panel -->
                 <div id="exifViewer" class="tool-panel">
                     <h2 class="text-2xl font-bold text-sky-400 mb-4">Image EXIF & Metadata Viewer</h2>
@@ -173,10 +173,10 @@
             Aetherium Shield | Secure Backend Proxy
         </footer>
     </div>
-    
+
     <script>
         // --- Core Functions ---
-        const BASE_URL = "http://127.0.0.1:8000/tools";
+        const BASE_URL = "/tools";
         const loaderHTML = (text = 'Analyzing...') => `<div class="flex justify-center items-center"><div class="loader"></div><span class="ml-4">${text}</span></div>`;
 
         function showTool(toolId) {
@@ -204,7 +204,7 @@
         }
 
         // --- Tool Handlers ---
-        
+
         async function handleUrlScan() {
             const url = document.getElementById('urlScannerInput').value;
             const resultDiv = 'urlScannerResult';
@@ -226,7 +226,7 @@
                     let verdictColor = "text-green-400";
                     if (stats.malicious > 0) { verdict = "Malicious"; verdictColor = "text-red-500"; }
                     else if (stats.suspicious > 0) { verdict = "Suspicious"; verdictColor = "text-yellow-400"; }
-                    
+
                     const html = `<h3 class="font-bold text-lg">Verdict: <span class="${verdictColor}">${verdict}</span></h3>
                                   <p>Malicious: ${stats.malicious} | Suspicious: ${stats.suspicious} | Harmless: ${stats.harmless}</p>`;
                     showResult(resultDiv, html);
@@ -257,7 +257,7 @@
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
-        
+
         async function handleContentAnalysis() {
             const text = document.getElementById('contentAnalyzerInput').value;
             const resultDiv = 'contentAnalyzerResult';
@@ -287,12 +287,12 @@
 
             if (!text && !file) { showResult(resultDiv, 'Please enter text or select a file.', true); return; }
             showResult(resultDiv, loaderHTML('Generating hash...'));
-            
+
             const formData = new FormData();
             formData.append('algorithm', algo);
             if(text) formData.append('text', text);
             if(file) formData.append('file', file);
-            
+
             try {
                 const response = await fetch(`${BASE_URL}/hash/`, { method: 'POST', body: formData });
                 const data = await response.json();
@@ -302,7 +302,7 @@
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
-        
+
         async function handleStegoHide() {
             const file = document.getElementById('stegoHideFile').files[0];
             const message = document.getElementById('stegoHideMessage').value;
@@ -330,20 +330,20 @@
                 a.click();
                 window.URL.revokeObjectURL(downloadUrl);
                 a.remove();
-                
+
                 showResult(resultDiv, `<p class="text-green-400">Image with hidden message downloaded successfully.</p>`);
 
             } catch (error) {
                  showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
-        
+
         async function handleStegoReveal() {
             const file = document.getElementById('stegoRevealFile').files[0];
             const resultDiv = 'steganographyResult';
             if (!file) { showResult(resultDiv, 'Please select a PNG to reveal the message from.', true); return; }
             showResult(resultDiv, loaderHTML('Revealing message...'));
-            
+
             const formData = new FormData();
             formData.append('file', file);
              try {
@@ -373,13 +373,13 @@
                 showResult(resultDiv, `Error: ${error.message}`, true);
             }
         }
-        
+
         async function handleFileScan() {
             const file = document.getElementById('fileScannerInput').files[0];
             const resultDiv = 'fileScannerResult';
             if (!file) { showResult(resultDiv, 'Please select a file.', true); return; }
             showResult(resultDiv, loaderHTML('Scanning file hash...'));
-            
+
             const formData = new FormData();
             formData.append('file', file);
 
@@ -486,12 +486,12 @@
                 const response = await fetch(`${BASE_URL}/view-exif/`, { method: 'POST', body: formData });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.detail);
-                
+
                 if (data.message) {
                     showResult(resultDiv, `<p>${data.message}</p>`);
                     return;
                 }
-                
+
                 const html = `<div class="font-mono text-xs space-y-1 overflow-auto max-h-60">
                                 ${Object.entries(data).map(([key, value]) => `<p><span class="text-gray-400">${key}:</span> ${String(value).slice(0, 200)}</p>`).join('')}
                               </div>`;
@@ -503,4 +503,3 @@
     </script>
 </body>
 </html>
-
