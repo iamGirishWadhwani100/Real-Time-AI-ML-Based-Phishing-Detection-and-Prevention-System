@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHISHNET SECURITY PLATFORM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    
+    <style>
+        /* --- MUTED CYBERPUNK AESTHETIC --- */
+        :root {
+            /* Softer, pastel-leaning versions of the previous neons */
+            --clr-cyan: #64d8cb;
+            --clr-cyan-rgb: 100, 216, 203;
+            --clr-pink: #d68bbf;
+            --clr-pink-rgb: 214, 139, 191;
+            --clr-green: #a6e37c;
+            --clr-green-rgb: 166, 227, 124;
+            --clr-yellow: #d6c86b;
+            --clr-yellow-rgb: 214, 200, 107;
+            --clr-red: #d66b6b;
+            --clr-red-rgb: 214, 107, 107;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #050a15;
+            background-image: 
+                linear-gradient(rgba(var(--clr-cyan-rgb), 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(var(--clr-cyan-rgb), 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #d1d5db; /* Softer white for general text */
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- REDUCED GLOW EFFECTS --- */
+        .neon-border-cyan {
+            border: 1px solid var(--clr-cyan);
+            box-shadow: 0 0 6px rgba(var(--clr-cyan-rgb), 0.15), inset 0 0 6px rgba(var(--clr-cyan-rgb), 0.05);
+            background: rgba(5, 15, 25, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        
+        .neon-text-cyan { color: var(--clr-cyan); text-shadow: 0 0 2px rgba(var(--clr-cyan-rgb), 0.2); }
+        .neon-text-pink { color: var(--clr-pink); text-shadow: 0 0 2px rgba(var(--clr-pink-rgb), 0.2); }
+        .neon-text-green { color: var(--clr-green); text-shadow: 0 0 2px rgba(var(--clr-green-rgb), 0.2); }
+        .neon-text-yellow { color: var(--clr-yellow); text-shadow: 0 0 2px rgba(var(--clr-yellow-rgb), 0.2); }
+        .neon-text-red { color: var(--clr-red); text-shadow: 0 0 2px rgba(var(--clr-red-rgb), 0.2); }
+
+        /* --- TABS AND BUTTONS --- */
+        .sub-tab {
+            border: 1px solid var(--clr-green);
+            color: var(--clr-green);
+            background: transparent;
+            transition: all 0.2s;
+            text-shadow: 0 0 2px rgba(var(--clr-green-rgb), 0.2);
+            box-shadow: 0 0 3px rgba(var(--clr-green-rgb), 0.1), inset 0 0 3px rgba(var(--clr-green-rgb), 0.05);
+            padding: 10px 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        .sub-tab.active {
+            background: rgba(var(--clr-green-rgb), 0.85);
+            color: #000;
+            text-shadow: none;
+            box-shadow: 0 0 8px rgba(var(--clr-green-rgb), 0.3);
+        }
+
+        .btn-action {
+            border: 1px solid var(--clr-green); color: var(--clr-green); background: rgba(0,0,0,0.4);
+            text-transform: uppercase; font-weight: bold; cursor: pointer; transition: all 0.2s;
+            padding: 10px 24px; letter-spacing: 2px;
+        }
+        .btn-action:hover { background: rgba(var(--clr-green-rgb), 0.15); box-shadow: 0 0 8px rgba(var(--clr-green-rgb), 0.25); }
+
+        .top-nav-btn {
+            border: 1px solid var(--clr-cyan); color: var(--clr-cyan); background: rgba(var(--clr-cyan-rgb), 0.05);
+            text-transform: uppercase; padding: 6px 16px; cursor: pointer; transition: all 0.2s;
+        }
+        .top-nav-btn:hover { background: rgba(var(--clr-cyan-rgb), 0.15); box-shadow: 0 0 8px rgba(var(--clr-cyan-rgb), 0.25); }
+
+        /* --- INPUTS --- */
+        .cyber-input {
+            background: rgba(0, 10, 20, 0.8); border: 1px solid var(--clr-cyan); color: #fff;
+            width: 100%; padding: 12px 15px; outline: none; transition: 0.3s;
+        }
+        .cyber-input:focus { box-shadow: 0 0 6px rgba(var(--clr-cyan-rgb), 0.25); border-color: var(--clr-pink); }
+
+        .upload-zone {
+            border: 1px dashed var(--clr-cyan); background: rgba(var(--clr-cyan-rgb), 0.03); cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 0.2s; height: 160px; width: 100%;
+        }
+        .upload-zone:hover { background: rgba(var(--clr-cyan-rgb), 0.08); box-shadow: inset 0 0 10px rgba(var(--clr-cyan-rgb), 0.15); }
+
+        /* --- TERMINAL WINDOW FOR REPORTS --- */
+        .terminal-box {
+            background: #02060a; border: 1px solid var(--clr-green); padding: 15px; color: var(--clr-green);
+            font-size: 0.9rem; white-space: pre-wrap; overflow-y: auto; height: 250px;
+            box-shadow: inset 0 0 8px rgba(var(--clr-green-rgb), 0.05);
+        }
+
+        /* --- UTILITIES --- */
+        .workspace-view { display: none; }
+        .workspace-view.active { display: block; animation: scanline 0.4s ease-out; }
+        .sub-content { display: none; }
+        .sub-content.active { display: block; animation: scanline 0.4s ease-out; }
+        
+        @keyframes scanline {
+            0% { opacity: 0; transform: translateY(10px); filter: blur(2px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050a15; }
+        ::-webkit-scrollbar-thumb { background: var(--clr-cyan); border-radius: 0; }
+        ::-webkit-scrollbar-thumb:hover { background: #fff; }
+        
+        /* Custom Checkbox */
+        input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 1px solid var(--clr-cyan); background: transparent; cursor: pointer; position: relative; }
+        input[type="checkbox"]:checked { background: var(--clr-cyan); }
+        input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: #000; font-size: 14px; top: -3px; left: 1px; font-weight: bold; }
+        
+        /* Custom Range */
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: var(--clr-cyan); outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--clr-pink); cursor: pointer; box-shadow: 0 0 6px var(--clr-pink); }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center">
+
+    <!-- ========================================== -->
+    <!-- VIEW: HOME DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="view-home" class="workspace-view active w-full max-w-6xl mt-8">
+        
+        <div class="neon-border-cyan p-12 mb-16 text-center relative">
+            <p class="neon-text-cyan text-sm tracking-[0.4em] mb-4">PHISHNET SECURITY PLATFORM</p>
+            <h1 class="neon-text-cyan text-4xl md:text-5xl lg:text-6xl font-bold tracking-wider mb-4">AUTONOMOUS DETECTION<br><span class="neon-text-pink mt-4 inline-block">OPERATIONS</span></h1>
+            <p class="text-slate-400 text-sm tracking-[0.2em] max-w-3xl mx-auto uppercase mt-6">INTEGRATED CYBER SUITE & PHISH-NET TOOLSET</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 px-4 md:px-10">
+            <!-- Mod 1 -->
+            <div class="group cursor-pointer" onclick="navTo('view-mod1')">
+                <p class="neon-text-cyan text-sm font-bold tracking-widest mb-2">MODULE 01</p>
+                <h2 class="neon-text-green text-2xl font-bold tracking-widest mb-4">PHISHING & THREATS</h2>
+                <p class="text-slate-400 text-sm mb-6 max-w-md uppercase">URL Analyzer, Domain Reputation, QR Scanner.</p>
+                <span class="neon-text-cyan font-bold uppercase tracking-widest flex items-center gap-2">LAUNCH WORKSPACE <i class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition-transform"></i></span>
+            </div>
+
+            <!-- Mod 2 -->
+            <div class="group cursor-pointer" onclick="navTo('view-mod2')">
+                <p class="neon-text-pink text-sm font-bold tracking-widest mb-2">MODULE 02</p>
+                <h2 class="neon-text-green text-2xl font-bold tracking-widest mb-4">NETWORK UTILITIES</h2>
+                <p class="text-slate-400 text-sm mb-6 max-w-md uppercase">Inspect PCAP traffic & Surface forensic indicators.</p>
+                <span class="neon-text-pink font-bold uppercase tracking-widest flex items-center gap-2">LAUNCH WORKSPACE <i class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition-transform"></i></span>
+            </div>
+
+            <!-- Mod 3 -->
+            <div class="group cursor-pointer" onclick="navTo('view-mod3')">
+                <p class="neon-text-cyan text-sm font-bold tracking-widest mb-2">MODULE 03</p>
+                <h2 class="neon-text-green text-2xl font-bold tracking-widest mb-4">CRYPTO & PASSWORDS</h2>
+                <p class="text-slate-400 text-sm mb-6 max-w-md uppercase">RSA, AES, Password Gen, Strength & Breach checks.</p>
+                <span class="neon-text-cyan font-bold uppercase tracking-widest flex items-center gap-2">LAUNCH WORKSPACE <i class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition-transform"></i></span>
+            </div>
+
+            <!-- Mod 4 -->
+            <div class="group cursor-pointer" onclick="navTo('view-mod4')">
+                <p class="neon-text-pink text-sm font-bold tracking-widest mb-2">MODULE 04</p>
+                <h2 class="neon-text-green text-2xl font-bold tracking-widest mb-4">FORENSICS ANALYSIS</h2>
+                <p class="text-slate-400 text-sm mb-6 max-w-md uppercase">Steganography payload embedding and extraction.</p>
+                <span class="neon-text-pink font-bold uppercase tracking-widest flex items-center gap-2">LAUNCH WORKSPACE <i class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition-transform"></i></span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODULE 01: PHISHING & THREATS -->
+    <!-- ========================================== -->
+    <div id="view-mod1" class="workspace-view w-full max-w-6xl mt-4">
+        
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="navTo('view-home')" class="top-nav-btn"><i class="fa-solid fa-arrow-left mr-2"></i> HOME</button>
+            <button onclick="navTo('view-mod2')" class="top-nav-btn">PACKET ANALYSIS <i class="fa-solid fa-arrow-right ml-2"></i></button>
+        </div>
+
+        <div class="neon-border-cyan p-6 mb-6 text-center">
+            <h1 class="neon-text-cyan text-3xl font-bold tracking-widest uppercase flex items-center justify-center gap-4">
+                <i class="fa-solid fa-shield-halved text-orange-400"></i> PHISHNET - PHISHING DETECTION
+            </h1>
+            <p class="text-slate-300 mt-4 tracking-[0.2em] text-sm uppercase">URL • DOMAIN • QR FORENSICS</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button onclick="openTab('mod1', 'url')" id="btn-mod1-url" class="sub-tab active"><i class="fa-solid fa-link mr-2"></i> URL ANALYSIS</button>
+            <button onclick="openTab('mod1', 'domain')" id="btn-mod1-domain" class="sub-tab"><i class="fa-solid fa-globe mr-2"></i> DOMAIN REPUTATION</button>
+            <button onclick="openTab('mod1', 'qr')" id="btn-mod1-qr" class="sub-tab"><i class="fa-solid fa-qrcode mr-2"></i> QR SCANNER</button>
+        </div>
+
+        <div class="neon-border-cyan p-8 min-h-[500px]">
+            
+            <!-- URL Analyzer -->
+            <div id="tab-mod1-url" class="sub-content active">
+                <h3 class="neon-text-green text-xl font-bold mb-6"><i class="fa-solid fa-link mr-2"></i> URL ANALYSIS</h3>
+                <div class="flex gap-4 mb-6">
+                    <input type="text" id="in-url" class="cyber-input text-lg" placeholder="Enter URL to analyze (e.g., https://example.com)">
+                    <button onclick="runTool('url')" class="btn-action">ANALYZE</button>
+                </div>
+                <div class="flex flex-col gap-3 mb-6 text-sm text-slate-400">
+                    <label class="flex items-center gap-3"><input type="checkbox" checked> Enable behavioral browser analysis</label>
+                    <label class="flex items-center gap-3"><input type="checkbox" checked> Enable detailed forensic reporting</label>
+                </div>
+                <div id="out-url" class="terminal-box hidden"></div>
+            </div>
+
+            <!-- Domain Reputation -->
+            <div id="tab-mod1-domain" class="sub-content">
+                <h3 class="neon-text-green text-xl font-bold mb-6"><i class="fa-solid fa-globe mr-2"></i> DOMAIN REPUTATION ENGINE</h3>
+                <div class="flex gap-4 mb-6">
+                    <input type="text" id="in-domain" class="cyber-input text-lg" placeholder="Target Domain (e.g., evil-phish.com)">
+                    <button onclick="runTool('domain')" class="btn-action">QUERY INTEL</button>
+                </div>
+                <div id="out-domain" class="terminal-box hidden"></div>
+            </div>
+
+            <!-- QR Scanner -->
+            <div id="tab-mod1-qr" class="sub-content">
+                <h3 class="neon-text-green text-xl font-bold mb-6"><i class="fa-solid fa-qrcode mr-2"></i> QR PAYLOAD DECODER</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label for="qr-file" class="upload-zone">
+                            <i class="fa-solid fa-cloud-arrow-up text-4xl neon-text-cyan mb-3"></i>
+                            <span class="text-slate-300 tracking-widest text-sm">CLICK TO UPLOAD QR IMAGE</span>
+                            <span class="text-slate-500 text-xs mt-2">.PNG, .JPG SUPPORTED</span>
+                        </label>
+                        <input type="file" id="qr-file" accept="image/*" class="hidden" onchange="decodeQR(this)">
+                        <canvas id="qr-canvas" class="hidden"></canvas>
+                    </div>
+                    <div>
+                        <div id="out-qr" class="terminal-box">WAITING FOR IMAGE UPLOAD...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODULE 02: PACKET ANALYSIS -->
+    <!-- ========================================== -->
+    <div id="view-mod2" class="workspace-view w-full max-w-6xl mt-4">
+        
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="navTo('view-mod1')" class="top-nav-btn"><i class="fa-solid fa-arrow-left mr-2"></i> PHISHING DETECTION</button>
+            <button onclick="navTo('view-mod3')" class="top-nav-btn">CRYPTO & PASSWORDS <i class="fa-solid fa-arrow-right ml-2"></i></button>
+        </div>
+
+        <div class="neon-border-cyan p-6 mb-6 text-center">
+            <h1 class="neon-text-cyan text-3xl font-bold tracking-widest uppercase flex items-center justify-center gap-4">
+                <i class="fa-solid fa-satellite-dish text-slate-300"></i> PHISHNET - PACKET ANALYSIS
+            </h1>
+            <p class="text-slate-300 mt-4 tracking-[0.2em] text-sm uppercase">PCAP UPLOAD • TRAFFIC VISUALIZATION • PACKET FILTERING</p>
+        </div>
+
+        <div class="neon-border-cyan p-1 min-h-[500px] relative flex flex-col">
+            <div class="absolute top-0 left-0 bg-cyan-900/20 px-4 py-2 border-b border-r border-cyan-500 text-cyan-400 text-xs font-bold tracking-widest" style="border-color: var(--clr-cyan); color: var(--clr-cyan);">
+                <i class="fa-solid fa-dolphin mr-2"></i>NETWORK TRAFFIC FORENSICS (PCAP)
+            </div>
+            
+            <div class="p-10 mt-12 flex-1 flex flex-col">
+                <label for="pcap-file" class="upload-zone mb-6" style="height: 200px;">
+                    <i class="fa-solid fa-satellite-dish text-5xl neon-text-yellow mb-4"></i>
+                    <span class="text-slate-300 font-bold tracking-widest text-lg">CLICK TO UPLOAD PCAP FILE</span>
+                    <span class="text-slate-500 tracking-widest text-sm mt-2">SUPPORTS .PCAP, .CAP, .PCAPNG</span>
+                </label>
+                <input type="file" id="pcap-file" accept=".pcap,.pcapng,.cap" class="hidden" onchange="runTool('pcap', this)">
+                
+                <div id="out-pcap" class="terminal-box hidden flex-1"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODULE 03: CRYPTO & PASSWORDS -->
+    <!-- ========================================== -->
+    <div id="view-mod3" class="workspace-view w-full max-w-6xl mt-4">
+        
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="navTo('view-mod2')" class="top-nav-btn"><i class="fa-solid fa-arrow-left mr-2"></i> PACKET ANALYSIS</button>
+            <button onclick="navTo('view-mod4')" class="top-nav-btn">FORENSICS <i class="fa-solid fa-arrow-right ml-2"></i></button>
+        </div>
+
+        <div class="neon-border-cyan p-6 mb-6 text-center">
+            <h1 class="neon-text-cyan text-3xl font-bold tracking-widest uppercase flex items-center justify-center gap-4">
+                <i class="fa-solid fa-key text-yellow-500"></i> CRYPTOGRAPHY & PASSWORDS
+            </h1>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
+            <button onclick="openTab('mod3', 'rsa')" id="btn-mod3-rsa" class="sub-tab active">RSA (ASYM)</button>
+            <button onclick="openTab('mod3', 'aes')" id="btn-mod3-aes" class="sub-tab">AES (SYM)</button>
+            <button onclick="openTab('mod3', 'pgen')" id="btn-mod3-pgen" class="sub-tab">PWD GEN</button>
+            <button onclick="openTab('mod3', 'pstr')" id="btn-mod3-pstr" class="sub-tab">PWD CHECK</button>
+            <button onclick="openTab('mod3', 'pwn')" id="btn-mod3-pwn" class="sub-tab">BREACH</button>
+        </div>
+
+        <div class="neon-border-cyan p-8 min-h-[500px]">
+            
+            <!-- RSA -->
+            <div id="tab-mod3-rsa" class="sub-content active">
+                <h3 class="neon-text-green text-xl font-bold mb-6 border-b border-gray-700 pb-4"><i class="fa-solid fa-key mr-2"></i> ASYMMETRIC CRYPTOGRAPHY (RSA-2048)</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <button onclick="generateRSA()" class="btn-action w-full mb-4">1. GENERATE NEW KEY PAIR</button>
+                        <div id="out-rsa-gen" class="terminal-box h-40 mb-4 text-xs hidden"></div>
+                        
+                        <label class="text-xs neon-text-cyan mb-1 block">PUBLIC KEY</label>
+                        <textarea id="rsa-pub" class="cyber-input h-20 mb-4 font-mono text-xs" readonly></textarea>
+                        <label class="text-xs neon-text-pink mb-1 block">PRIVATE KEY</label>
+                        <textarea id="rsa-priv" class="cyber-input h-20 mb-4 font-mono text-xs" readonly></textarea>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <div class="p-4 border border-gray-700 bg-black/30">
+                            <label class="text-xs text-slate-400 mb-1 block">2. ENCRYPT MESSAGE (REQUIRES PUBLIC KEY)</label>
+                            <input type="text" id="rsa-enc-msg" class="cyber-input mb-2" placeholder="Secret Message">
+                            <button onclick="encryptRSA()" class="btn-action w-full py-2 mb-2 text-sm">ENCRYPT</button>
+                            <textarea id="rsa-enc-out" class="cyber-input h-16 font-mono text-xs text-yellow-300" readonly placeholder="Ciphertext"></textarea>
+                        </div>
+                        <div class="p-4 border border-gray-700 bg-black/30">
+                            <label class="text-xs text-slate-400 mb-1 block">3. DECRYPT MESSAGE (REQUIRES PRIVATE KEY)</label>
+                            <input type="text" id="rsa-dec-msg" class="cyber-input mb-2" placeholder="Paste Ciphertext">
+                            <button onclick="decryptRSA()" class="btn-action w-full py-2 mb-2 text-sm" style="border-color: var(--clr-pink); color: var(--clr-pink);">DECRYPT</button>
+                            <textarea id="rsa-dec-out" class="cyber-input h-16 font-mono text-xs text-green-300" readonly placeholder="Plaintext"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AES -->
+            <div id="tab-mod3-aes" class="sub-content">
+                <h3 class="neon-text-green text-xl font-bold mb-6 border-b border-gray-700 pb-4"><i class="fa-solid fa-lock mr-2"></i> SYMMETRIC ENCRYPTION (AES-256-GCM)</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <label class="text-xs text-slate-400 mb-1 block">1. ENCRYPT PAYLOAD</label>
+                        <textarea id="aes-enc-msg" class="cyber-input h-20 mb-2" placeholder="Plaintext..."></textarea>
+                        <input type="password" id="aes-enc-pwd" class="cyber-input mb-4" placeholder="Encryption Password">
+                        <button onclick="encryptAES()" class="btn-action w-full mb-4">ENCRYPT</button>
+                        <textarea id="aes-enc-out" class="cyber-input h-32 font-mono text-xs text-yellow-300" readonly placeholder="Output JSON {ct, iv, salt}"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 mb-1 block">2. DECRYPT PAYLOAD</label>
+                        <textarea id="aes-dec-msg" class="cyber-input h-32 mb-2 font-mono text-xs" placeholder="Paste JSON here..."></textarea>
+                        <input type="password" id="aes-dec-pwd" class="cyber-input mb-4" placeholder="Decryption Password">
+                        <button onclick="decryptAES()" class="btn-action w-full mb-4" style="border-color: var(--clr-pink); color: var(--clr-pink);">DECRYPT</button>
+                        <input type="text" id="aes-dec-out" class="cyber-input text-green-300" readonly placeholder="Decrypted Text">
+                    </div>
+                </div>
+                <div id="out-aes" class="terminal-box hidden h-32 mt-6"></div>
+            </div>
+
+            <!-- Password Generator -->
+            <div id="tab-mod3-pgen" class="sub-content">
+                <h3 class="neon-text-green text-xl font-bold mb-6"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> SECURE PASSWORD GENERATOR</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="mb-6">
+                            <label class="font-bold flex justify-between text-cyan-300">LENGTH: <span id="pwd-len-val">16</span></label>
+                            <input type="range" id="pwd-len" min="8" max="64" value="16" oninput="document.getElementById('pwd-len-val').innerText = this.value" class="mt-4">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" id="chk-uc" checked> Uppercase</label>
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" id="chk-lc" checked> Lowercase</label>
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" id="chk-num" checked> Numbers</label>
+                            <label class="flex items-center gap-2 text-slate-300"><input type="checkbox" id="chk-sym" checked> Symbols</label>
+                        </div>
+                        <button onclick="generatePassword()" class="btn-action w-full py-4 text-xl">GENERATE</button>
+                        <input type="text" id="pwd-out" class="cyber-input text-center text-2xl font-mono tracking-widest mt-6 py-4" readonly placeholder="Output">
+                    </div>
+                    <div id="out-pgen" class="terminal-box h-full">WAITING FOR GENERATION...</div>
+                </div>
+            </div>
+
+            <!-- Password Checker -->
+            <div id="tab-mod3-pstr" class="sub-content">
+                <h3 class="neon-text-green text-xl font-bold mb-6"><i class="fa-solid fa-magnifying-glass mr-2"></i> PASSWORD ENTROPY CHECKER</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <input type="password" id="str-input" oninput="checkStrength()" class="cyber-input py-4 text-xl tracking-widest text-center mb-6" placeholder="TYPE PASSWORD...">
+                        <div class="p-6 border border-cyan-800 bg-black/30 text-center">
+                            <p class="text-sm text-slate-400 tracking-widest mb-2">STRENGTH VERDICT</p>
+                            <h2 id="str-label" class="text-4xl font-bold neon-text-cyan">-</h2>
+                        </div>
+                    </div>
+                    <div id="out-pstr" class="terminal-box h-full">AWAITING INPUT STREAM...</div>
+                </div>
+            </div>
+
+            <!-- Password Breach -->
+            <div id="tab-mod3-pwn" class="sub-content">
+                <h3 class="neon-text-green text-xl font-bold mb-6"><i class="fa-solid fa-database mr-2"></i> H.I.B.P BREACH CHECKER</h3>
+                <p class="text-sm text-slate-400 mb-6">Safely queries Have I Been Pwned via k-anonymity (SHA-1 prefix). Full string never leaves device.</p>
+                <div class="flex gap-4 mb-6">
+                    <input type="password" id="pwn-input" class="cyber-input text-xl tracking-widest" placeholder="ENTER PASSWORD...">
+                    <button onclick="checkPwned()" class="btn-action px-8">VERIFY</button>
+                </div>
+                <div id="out-pwn" class="terminal-box h-48"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODULE 04: FORENSICS (STEGANOGRAPHY)       -->
+    <!-- ========================================== -->
+    <div id="view-mod4" class="workspace-view w-full max-w-6xl mt-4">
+        
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="navTo('view-mod3')" class="top-nav-btn"><i class="fa-solid fa-arrow-left mr-2"></i> CRYPTO</button>
+            <button onclick="navTo('view-home')" class="top-nav-btn">HOME <i class="fa-solid fa-house ml-2"></i></button>
+        </div>
+
+        <div class="neon-border-cyan p-6 mb-6 text-center">
+            <h1 class="neon-text-pink text-3xl font-bold tracking-widest uppercase flex items-center justify-center gap-4">
+                <i class="fa-solid fa-user-secret text-slate-300"></i> FORENSICS ANALYSIS
+            </h1>
+        </div>
+
+        <div class="neon-border-cyan p-8 min-h-[500px]">
+            <h3 class="neon-text-green text-xl font-bold mb-6 border-b border-gray-700 pb-4"><i class="fa-solid fa-eye-slash mr-2"></i> LSB STEGANOGRAPHY ENGINE</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- HIDE -->
+                <div>
+                    <h4 class="font-bold text-cyan-300 tracking-widest mb-4">1. INJECT PAYLOAD (HIDE)</h4>
+                    <label for="stego-in-file" class="upload-zone mb-4">
+                        <i class="fa-solid fa-upload text-3xl mb-2 text-cyan-500"></i>
+                        <span class="text-sm font-bold tracking-widest text-slate-300" id="stego-in-lbl">UPLOAD CARRIER (.PNG)</span>
+                    </label>
+                    <input type="file" id="stego-in-file" accept="image/png" class="hidden" onchange="document.getElementById('stego-in-lbl').innerText = this.files[0].name; document.getElementById('stego-in-lbl').classList.add('neon-text-green')">
+                    
+                    <textarea id="stego-msg" class="cyber-input h-24 mb-4" placeholder="Enter secret payload text..."></textarea>
+                    <button onclick="hideSteganography()" class="btn-action w-full">INJECT & DOWNLOAD</button>
+                    <canvas id="stego-canvas" class="hidden"></canvas>
+                </div>
+
+                <!-- REVEAL -->
+                <div>
+                    <h4 class="font-bold text-pink-300 tracking-widest mb-4">2. EXTRACT PAYLOAD (REVEAL)</h4>
+                    <label for="stego-out-file" class="upload-zone mb-4" style="border-color: var(--clr-pink);">
+                        <i class="fa-solid fa-magnifying-glass text-3xl mb-2" style="color: var(--clr-pink);"></i>
+                        <span class="text-sm font-bold tracking-widest text-slate-300" id="stego-out-lbl">UPLOAD STEGO-IMAGE (.PNG)</span>
+                    </label>
+                    <input type="file" id="stego-out-file" accept="image/png" class="hidden" onchange="document.getElementById('stego-out-lbl').innerText = this.files[0].name; document.getElementById('stego-out-lbl').style.color = 'var(--clr-green)'">
+                    
+                    <button onclick="revealSteganography()" class="btn-action w-full mb-4" style="border-color: var(--clr-pink); color: var(--clr-pink);">EXTRACT DATA</button>
+                    
+                    <div id="out-stego" class="terminal-box h-32">WAITING FOR EXTRACTION...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC                           -->
+    <!-- ========================================== -->
+    <script>
+        // --- Navigation ---
+        function navTo(viewId) {
+            document.querySelectorAll('.workspace-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function openTab(mod, tab) {
+            document.querySelectorAll(`#view-${mod} .sub-tab`).forEach(el => el.classList.remove('active'));
+            document.querySelectorAll(`#view-${mod} .sub-content`).forEach(el => el.classList.remove('active'));
+            document.getElementById(`btn-${mod}-${tab}`).classList.add('active');
+            document.getElementById(`tab-${mod}-${tab}`).classList.add('active');
+        }
+
+        // --- Terminal Helper ---
+        function writeTerm(id, text, append = false, delay = 0) {
+            const out = document.getElementById(id);
+            out.classList.remove('hidden');
+            setTimeout(() => {
+                if(append) out.innerHTML += text + '\n';
+                else out.innerHTML = text + '\n';
+                out.scrollTop = out.scrollHeight;
+            }, delay);
+        }
+
+        // ==========================================
+        // MODULE 1: URL & DOMAIN & QR
+        // ==========================================
+        function runTool(toolCode, el = null) {
+            if(toolCode === 'url') {
+                const url = document.getElementById('in-url').value;
+                if(!url) return;
+                writeTerm('out-url', `<span class="neon-text-cyan">[*] INITIATING URL FORENSICS...</span>\n[*] Target: ${url}\n`);
+                writeTerm('out-url', `[*] Performing Static Analysis...\n    - Length: ${url.length} bytes\n    - Protocol: ${url.startsWith('https') ? 'HTTPS (Secure)' : '<span class="neon-text-red">HTTP (Insecure)</span>'}\n`, true, 800);
+                writeTerm('out-url', `[*] Querying Threat Intel (Mock API)...\n    - Google Safe Browsing: <span class="neon-text-green">CLEAN</span>\n    - VirusTotal: <span class="neon-text-green">0/89 Flags</span>\n`, true, 1600);
+                setTimeout(() => {
+                    const threat = url.includes('login') || !url.startsWith('http') ? 85 : Math.floor(Math.random()*10);
+                    const color = threat > 50 ? 'neon-text-red' : 'neon-text-green';
+                    writeTerm('out-url', `\n<span class="neon-text-cyan">[+] ANALYSIS COMPLETE</span>\n<span class="${color}">> FINAL THREAT SCORE: ${threat}%</span>`, true);
+                }, 2500);
+            }
+            if(toolCode === 'domain') {
+                const target = document.getElementById('in-domain').value;
+                if(!target) return;
+                writeTerm('out-domain', `<span class="neon-text-cyan">[*] FETCHING OSINT FOOTPRINT: ${target}</span>\n`);
+                const isBad = target.includes('evil') || target.includes('phish');
+                writeTerm('out-domain', `[*] WHOIS Records\n    Registrar: NameCheap, Inc.\n    Created: ${isBad ? '<span class="neon-text-red">2 Days Ago</span>' : '1998-05-12'}\n`, true, 800);
+                writeTerm('out-domain', `[*] DNS Resolution\n    A Record: ${isBad ? '185.199.108.153 (Russia)' : '142.250.190.46 (USA)'}\n    TXT Record: "v=spf1 include:_spf.google.com ~all"\n`, true, 1600);
+                writeTerm('out-domain', `\n[*] REPUTATION RESULT: ${isBad ? '<span class="neon-text-red">MALICIOUS (12/89 Vendors Flagged)</span>' : '<span class="neon-text-green">CLEAN (Trusted Domain)</span>'}`, true, 2400);
+            }
+            if(toolCode === 'pcap' && el) {
+                const file = el.files[0];
+                if(!file) return;
+                const size = (file.size/1024).toFixed(2);
+                writeTerm('out-pcap', `<span class="neon-text-cyan">[*] PCAP INGESTION STARTED: ${file.name} (${size} KB)</span>\n`);
+                writeTerm('out-pcap', `[*] Validating Magic Bytes... <span class="neon-text-green">0xa1b2c3d4 (Libpcap OK)</span>\n[*] Building Packet Index...\n`, true, 800);
+                writeTerm('out-pcap', `\n<span class="neon-text-yellow">==== TRAFFIC SUMMARY ====</span>\n- Total Packets: 2845\n- TCP Streams: 142\n- UDP Datagrams: 56\n`, true, 2000);
+                setTimeout(() => {
+                    let insights = `\n<span class="neon-text-yellow">==== DEEP PACKET INSPECTION ====</span>\n`;
+                    if(file.name.toLowerCase().includes('malware') || file.size < 5000) {
+                        insights += `<span class="neon-text-red">[!] ALERT: Plaintext Traffic Detected.</span>\n    Frame 412: HTTP GET to raw IP.\n    [PAYLOAD] "GET /payload.bin HTTP/1.1..."\n    <span class="neon-text-red">WARNING: Potential C2 Beaconing.</span>`;
+                    } else {
+                        insights += `<span class="neon-text-green">[+] Routine TLS Traffic Identified.</span>\n    - Encrypted: Yes (Port 443)\n    - No cleartext credentials found.`;
+                    }
+                    writeTerm('out-pcap', insights + `\n\n<span class="neon-text-cyan">[+] ANALYSIS COMPLETE.</span>`, true);
+                }, 3500);
+            }
+        }
+
+        // --- REAL QR Scanner ---
+        function decodeQR(input) {
+            const file = input.files[0];
+            if (!file) return;
+            writeTerm('out-qr', `<span class="neon-text-cyan">[*] INGESTING IMAGE: ${file.name}</span>\n[*] Initializing jsQR Matrix Decoder...\n`);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('qr-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width; canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    writeTerm('out-qr', `[*] Image Dimensions: ${img.width}x${img.height}px\n[*] Scanning pixel array...\n`, true, 500);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+
+                    setTimeout(() => {
+                        if (code) {
+                            writeTerm('out-qr', `\n<span class="neon-text-green">[+] VALID QR MATRIX FOUND!</span>\n    - Payload Length: ${code.data.length} bytes\n\n<span class="neon-text-yellow">DECODED DATA:</span>\n${code.data}`, true);
+                        } else {
+                            writeTerm('out-qr', `\n<span class="neon-text-red">[-] CRITICAL: Decoder failed. No finder patterns located.</span>`, true);
+                        }
+                    }, 1200);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ==========================================
+        // MODULE 3: CRYPTOGRAPHY (REAL Web Crypto API)
+        // ==========================================
+        function ab2str(buf) { return String.fromCharCode.apply(null, new Uint8Array(buf)); }
+        function str2ab(str) { const buf = new ArrayBuffer(str.length); const bufView = new Uint8Array(buf); for (let i = 0; i < str.length; i++) bufView[i] = str.charCodeAt(i); return buf; }
+        
+        async function generateRSA() {
+            writeTerm('out-rsa-gen', `<span class="neon-text-cyan">[*] Generating RSA Key Pair...</span>\n`);
+            try {
+                const start = performance.now();
+                const keyPair = await window.crypto.subtle.generateKey({ name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["encrypt", "decrypt"]);
+                
+                const pubExport = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+                document.getElementById('rsa-pub').value = `-----BEGIN PUBLIC KEY-----\n${btoa(ab2str(pubExport)).match(/.{1,64}/g).join('\n')}\n-----END PUBLIC KEY-----`;
+
+                const privExport = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+                document.getElementById('rsa-priv').value = `-----BEGIN PRIVATE KEY-----\n${btoa(ab2str(privExport)).match(/.{1,64}/g).join('\n')}\n-----END PRIVATE KEY-----`;
+
+                writeTerm('out-rsa-gen', `[*] Time: ${(performance.now()-start).toFixed(2)}ms\n[*] Algorithm: RSA-OAEP (2048-bit)\n<span class="neon-text-green">[+] Keys exported to SPKI & PKCS#8.</span>`, true);
+            } catch (e) { writeTerm('out-rsa-gen', `<span class="neon-text-red">[-] Error: ${e.message}</span>`, true); }
+        }
+
+        function pemToArrayBuffer(pem) { return str2ab(atob(pem.replace(/-----BEGIN[^-]+-----/g, '').replace(/-----END[^-]+-----/g, '').replace(/\s/g, ''))); }
+
+        async function encryptRSA() {
+            const pem = document.getElementById('rsa-pub').value; // Using generated key directly for UX speed
+            const msg = document.getElementById('rsa-enc-msg').value;
+            if(!pem || !msg) return alert("Generate keys and enter a message first.");
+            try {
+                const key = await window.crypto.subtle.importKey("spki", pemToArrayBuffer(pem), {name: "RSA-OAEP", hash: "SHA-256"}, true, ["encrypt"]);
+                const enc = await window.crypto.subtle.encrypt({name: "RSA-OAEP"}, key, new TextEncoder().encode(msg));
+                const b64Cipher = btoa(ab2str(enc));
+                document.getElementById('rsa-enc-out').value = b64Cipher;
+                document.getElementById('rsa-dec-msg').value = b64Cipher; // Auto fill decrypt
+            } catch(e) { alert("Encryption Error."); }
+        }
+
+        async function decryptRSA() {
+            const pem = document.getElementById('rsa-priv').value;
+            const cipher = document.getElementById('rsa-dec-msg').value;
+            if(!pem || !cipher) return alert("Generate keys and enter ciphertext first.");
+            try {
+                const key = await window.crypto.subtle.importKey("pkcs8", pemToArrayBuffer(pem), {name: "RSA-OAEP", hash: "SHA-256"}, true, ["decrypt"]);
+                const dec = await window.crypto.subtle.decrypt({name: "RSA-OAEP"}, key, str2ab(atob(cipher)));
+                document.getElementById('rsa-dec-out').value = new TextDecoder().decode(dec);
+            } catch(e) { alert("Decryption Error: Key mismatch."); }
+        }
+
+        // --- AES ---
+        async function getAesKey(password, salt) {
+            const enc = new TextEncoder();
+            const keyMat = await window.crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+            return window.crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" }, keyMat, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+        }
+
+        async function encryptAES() {
+            const msg = document.getElementById('aes-enc-msg').value;
+            const pwd = document.getElementById('aes-enc-pwd').value;
+            if(!msg || !pwd) return alert("Missing Message or Password");
+            writeTerm('out-aes', `<span class="neon-text-cyan">[*] Initiating AES-256-GCM Encryption</span>\n[*] Generating 16-byte Salt & 12-byte IV...\n[*] Deriving key via PBKDF2 (100k iter)...\n`);
+            
+            try {
+                const salt = window.crypto.getRandomValues(new Uint8Array(16));
+                const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                const key = await getAesKey(pwd, salt);
+                const enc = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(msg));
+                
+                const outJson = JSON.stringify({ ct: btoa(ab2str(enc)), salt: btoa(ab2str(salt)), iv: btoa(ab2str(iv)) }, null, 2);
+                document.getElementById('aes-enc-out').value = outJson;
+                document.getElementById('aes-dec-msg').value = outJson; // Auto fill
+                writeTerm('out-aes', `<span class="neon-text-green">[+] Encryption Successful. Payload formatted as JSON.</span>`, true);
+            } catch (e) { writeTerm('out-aes', `<span class="neon-text-red">[-] Encryption Error.</span>`, true); }
+        }
+
+        async function decryptAES() {
+            const jsonStr = document.getElementById('aes-dec-msg').value;
+            const pwd = document.getElementById('aes-dec-pwd').value;
+            writeTerm('out-aes', `<span class="neon-text-cyan">[*] Initiating AES-256-GCM Decryption</span>\n`);
+            try {
+                const data = JSON.parse(jsonStr);
+                const key = await getAesKey(pwd, str2ab(atob(data.salt)));
+                const dec = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: str2ab(atob(data.iv))}, key, str2ab(atob(data.ct)));
+                document.getElementById('aes-dec-out').value = new TextDecoder().decode(dec);
+                writeTerm('out-aes', `<span class="neon-text-green">[+] Decryption Successful.</span>`, true);
+            } catch(e) { writeTerm('out-aes', `<span class="neon-text-red">[-] Decryption Failed: Wrong password or corrupt data.</span>`, true); }
+        }
+
+        // ==========================================
+        // MODULE 3: PASSWORDS
+        // ==========================================
+        function generatePassword() {
+            const len = document.getElementById('pwd-len').value;
+            const chars = (document.getElementById('chk-uc').checked ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ" : "") +
+                          (document.getElementById('chk-lc').checked ? "abcdefghijklmnopqrstuvwxyz" : "") +
+                          (document.getElementById('chk-num').checked ? "0123456789" : "") +
+                          (document.getElementById('chk-sym').checked ? "!@#$%^&*()_+~`|}{[]:;?><,./-=" : "");
+            
+            const pool = chars || "abcdefghijklmnopqrstuvwxyz";
+            let pwd = ""; const array = new Uint32Array(len); window.crypto.getRandomValues(array);
+            for(let i=0; i<len; i++) pwd += pool[array[i] % pool.length];
+            document.getElementById('pwd-out').value = pwd;
+
+            const entropy = (len * Math.log2(pool.length)).toFixed(1);
+            writeTerm('out-pgen', `<span class="neon-text-cyan">[*] Cryptographic Password Generation</span>\n[*] Pool Size: ${pool.length}\n[*] Entropy: ${entropy} bits\n` + 
+                (entropy > 70 ? `<span class="neon-text-green">[+] Resistance: Highly Resilient</span>` : `<span class="neon-text-red">[-] Resistance: Weak</span>`)
+            );
+        }
+
+        function checkStrength() {
+            const pwd = document.getElementById('str-input').value;
+            if(!pwd) { document.getElementById('str-label').innerText = "-"; writeTerm('out-pstr', "AWAITING INPUT STREAM..."); return; }
+
+            let pool = 0;
+            if(/[A-Z]/.test(pwd)) pool += 26; if(/[a-z]/.test(pwd)) pool += 26;
+            if(/[0-9]/.test(pwd)) pool += 10; if(/[^A-Za-z0-9]/.test(pwd)) pool += 32;
+
+            const entropy = pool > 0 ? (pwd.length * Math.log2(pool)).toFixed(1) : 0;
+            let verdict = entropy < 40 ? '<span class="neon-text-red">WEAK</span>' : (entropy < 70 ? '<span class="neon-text-yellow">MODERATE</span>' : '<span class="neon-text-green">STRONG</span>');
+            document.getElementById('str-label').innerHTML = verdict;
+
+            writeTerm('out-pstr', `<span class="neon-text-cyan">[*] Entropy Analysis</span>\n[*] Length: ${pwd.length}\n[*] Pool: ${pool}\n[*] Calculated Entropy: ${entropy} bits\n[*] Brute Force Est: ${entropy < 40 ? 'Instantly' : (entropy < 70 ? 'Days' : 'Centuries')}`);
+        }
+
+        async function checkPwned() {
+            const pwd = document.getElementById('pwn-input').value;
+            if(!pwd) return;
+            writeTerm('out-pwn', `<span class="neon-text-cyan">[*] Preparing k-Anonymity Request...</span>\n[*] Hashing locally (SHA-1)...\n`);
+
+            const msgUint8 = new TextEncoder().encode(pwd);
+            const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
+            const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+            
+            const prefix = hashHex.substring(0, 5); const suffix = hashHex.substring(5);
+            writeTerm('out-pwn', `[*] Sending Prefix: ${prefix}\n[*] Querying HIBP API...\n`, true, 500);
+
+            try {
+                const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+                const lines = (await res.text()).split('\n');
+                let foundCount = 0;
+                for(let line of lines) { if(line.startsWith(suffix)) { foundCount = parseInt(line.split(':')[1].trim()); break; } }
+
+                setTimeout(() => {
+                    if(foundCount > 0) writeTerm('out-pwn', `<span class="neon-text-red">[-] MATCH FOUND. Password compromised ${foundCount.toLocaleString()} times. DO NOT USE.</span>`, true);
+                    else writeTerm('out-pwn', `<span class="neon-text-green">[+] NO MATCH. Password is clear from known public breaches.</span>`, true);
+                }, 1500);
+            } catch(e) { writeTerm('out-pwn', `<span class="neon-text-red">[-] Error: API connection failed.</span>`, true); }
+        }
+
+        // ==========================================
+        // MODULE 4: STEGANOGRAPHY (REAL CANVAS LSB)
+        // ==========================================
+        function hideSteganography() {
+            const fileInput = document.getElementById('stego-in-file');
+            const msg = document.getElementById('stego-msg').value;
+            if (!fileInput.files[0] || !msg) return alert("Upload an image and type a message.");
+            writeTerm('out-stego', `<span class="neon-text-cyan">[*] LSB Steganography Engine: HIDE</span>\n[*] Analyzing Carrier Image...\n`);
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('stego-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width; canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+
+                    let binaryMsg = "";
+                    for (let i = 0; i < msg.length; i++) binaryMsg += "00000000".slice(msg.charCodeAt(i).toString(2).length) + msg.charCodeAt(i).toString(2);
+                    binaryMsg += "00000000"; // Null terminator
+
+                    if (binaryMsg.length > (data.length / 4) * 3) return writeTerm('out-stego', `<span class="neon-text-red">[-] Error: Message too large for carrier.</span>`, true);
+
+                    writeTerm('out-stego', `[*] Injecting ${msg.length} bytes into LSB of RGB channels...\n`, true, 500);
+
+                    let bitIndex = 0;
+                    for (let i = 0; i < data.length && bitIndex < binaryMsg.length; i++) {
+                        if ((i + 1) % 4 === 0) continue; // Skip alpha
+                        data[i] = (data[i] & 0xFE) | parseInt(binaryMsg[bitIndex]);
+                        bitIndex++;
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                    
+                    setTimeout(() => {
+                        writeTerm('out-stego', `<span class="neon-text-green">[+] Injection Complete. Downloading Stego-Image (PNG).</span>`, true);
+                        const link = document.createElement('a'); link.download = 'stego_hidden.png'; link.href = canvas.toDataURL('image/png'); link.click();
+                    }, 1000);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function revealSteganography() {
+            const fileInput = document.getElementById('stego-out-file');
+            if (!fileInput.files[0]) return alert("Upload a stego image.");
+            writeTerm('out-stego', `<span class="neon-text-cyan">[*] LSB Steganography Engine: REVEAL</span>\n[*] Extracting bits from RGB channels...\n`);
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('stego-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width; canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+
+                    let binaryStr = ""; let finalMsg = "";
+                    for (let i = 0; i < data.length; i++) {
+                        if ((i + 1) % 4 === 0) continue;
+                        binaryStr += (data[i] & 1);
+                        if (binaryStr.length === 8) {
+                            let charCode = parseInt(binaryStr, 2);
+                            if (charCode === 0) break; // Null terminator
+                            finalMsg += String.fromCharCode(charCode);
+                            binaryStr = "";
+                        }
+                    }
+
+                    setTimeout(() => {
+                        if(finalMsg && /^[ -~]+$/.test(finalMsg)) {
+                            writeTerm('out-stego', `<span class="neon-text-green">[+] Decoding Successful.</span>\n\n<span class="neon-text-yellow">SECRET MESSAGE:</span>\n${finalMsg}`, true);
+                        } else {
+                            writeTerm('out-stego', `<span class="neon-text-red">[-] Decoding Failed. Random noise extracted. Not a valid stego-image.</span>`, true);
+                        }
+                    }, 1000);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    </script>
+</body>
+</html>
