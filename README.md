@@ -89,6 +89,15 @@ Password Toolkit
 
 Contributions, issues, and feature requests are welcome!
 Feel free to check the issues page if you want to contribute.
+Fork the Project
+
+Create your Feature Branch (git checkout -b feature/AmazingFeature)
+
+Commit your Changes (git commit -m 'Add some AmazingFeature')
+
+Push to the Branch (git push origin feature/AmazingFeature)
+
+Open a Pull Request
 
 📄 License
 
