@@ -56,7 +56,7 @@ Because Cyber Suite is a zero-dependency, static frontend application, installat
 
 Clone the repository:
 
-git clone [https://github.com/yourusername/cyber-suite.git](https://github.com/yourusername/cyber-suite.git)
+git clone [https://github.com/iamGirishWadhwani100/cyber-suite.git](https://github.com/yourusername/cyber-suite.git)
 
 
 Navigate to the directory:
