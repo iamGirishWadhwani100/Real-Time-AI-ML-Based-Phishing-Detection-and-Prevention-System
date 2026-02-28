@@ -68,9 +68,6 @@ cd cyber-suite
 Simply double-click the index.html file to open it in any modern web browser (Chrome, Firefox, Safari, Edge). No local server (like Node or Python) is required!
 
 **📸 Screenshots**
-
-(Note: Add your actual screenshot image files to an /assets/ folder in your repo and update these links)
-
 <details>
 <summary>Click to view screenshots</summary>
 
