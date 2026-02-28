@@ -77,7 +77,7 @@ Simply double-click the index.html file to open it in any modern web browser (Ch
 **Dashboard & UI**
 <img src="assets/dashboard.png" width="800" alt="Cyber Suite Dashboard">
 
-Cryptographic Operations
+**Cryptographic Operations**
 <img src="assets/Crypto_RSA.png" width="800" alt="RSA Cryptography">
 <img src="assets/Crypto_AES.png" width="800" alt="AES Cryptography">
 
