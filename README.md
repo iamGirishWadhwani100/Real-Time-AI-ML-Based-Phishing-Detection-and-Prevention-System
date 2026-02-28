@@ -78,10 +78,12 @@ Dashboard & UI
 <img src="assets/dashboard.png" width="800" alt="Cyber Suite Dashboard">
 
 Cryptographic Operations
-<img src="assets/crypto.png" width="800" alt="RSA and AES Cryptography">
+<img src="assets/Crypto_RSA.png" width="800" alt="RSA Cryptography">
+<img src="assets/Crypto_AES.png" width="800" alt="AES Cryptography">
 
 Password Toolkit
-<img src="assets/passwords.png" width="800" alt="Password Generator and Breach Check">
+<img src="assets/Password_Gen.png" width="800" alt="Password Generator">
+<img src="assets/Password_Breach.png" width="800" alt="Password Breach Check">
 
 </details>
 
