@@ -69,8 +69,6 @@ Simply double-click the index.html file to open it in any modern web browser (Ch
 
 📸 Screenshots
 
-(Note: Add your actual screenshot image files to an /assets/ folder in your repo and update these links)
-
 <details>
 <summary>Click to view screenshots</summary>
 
