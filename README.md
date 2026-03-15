@@ -7,7 +7,7 @@ At the core of the platform is J.A.R.V.I.S., a fully integrated Natural Language
 🖥️ System Dashboard
 
 <p align="center">
-<img src="Screenshot 2026-03-14 at 18.34.16.jpg" width="800" alt="PhishNet Autonomous Operations Dashboard">
+<img src="/assets/dashboard.png" width="800" alt="PhishNet Autonomous Operations Dashboard">
 </p>
 
 ✨ Core Features & Modules
