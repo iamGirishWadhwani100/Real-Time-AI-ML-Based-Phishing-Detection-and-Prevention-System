@@ -357,7 +357,7 @@
             writeTerm(outId, `<span class="text-cyan-muted">[*] Transmitting payload to Phish-Net Backend (${toolCode})...</span>\n`);
             try {
                 // (Optional: Remember to change 127.0.0.1 to your Render URL later!)
-                const response = await fetch(`https://real-time-ai-ml-based-phishing-detection-4jfd.onrender.com/api/tool/${toolCode}`, {
+                const response = await fetch(`https://real-time-ai-ml-based-phishing-detection.onrender.com/api/tool/${toolCode}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payload: payload })
                 });
                 const data = await response.json();
@@ -370,7 +370,7 @@
             const ip = document.getElementById('in-ip-target').value;
             writeTerm('out-ip', `<span class="text-cyan-muted">[*] INITIATING GLOBAL THREAT SCAN FOR IP: ${ip}...</span>\n`);
             try {
-                const response = await fetch(`https://real-time-ai-ml-based-phishing-detection-4jfd.onrender.com/api/tool/ip_scan`, {
+                const response = await fetch(`https://real-time-ai-ml-based-phishing-detection.onrender.com/api/tool/ip_scan`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payload: ip })
                 });
                 const data = await response.json();
