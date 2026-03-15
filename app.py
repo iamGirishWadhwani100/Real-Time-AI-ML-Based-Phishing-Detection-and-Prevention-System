@@ -1,37 +1,52 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sqlite3
+import psycopg2
 import hashlib
 
 app = Flask(__name__)
 CORS(app)
 
 # =======================================================
-# 1. ZERO-ERROR FILE DATABASE (SQLite)
+# 1. VERCEL BUILT-IN POSTGRES DATABASE
 # =======================================================
-DB_FILE = 'phishnet.db'
+# Vercel automatically provides this URL securely in the background!
+def get_db_connection():
+    db_url = os.environ.get('POSTGRES_URL')
+    if not db_url:
+        raise Exception("Database URL not found! Make sure you created Vercel Postgres in the Storage tab.")
+    
+    # Vercel Postgres sometimes requires 'postgresql://' instead of 'postgres://'
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+        
+    return psycopg2.connect(db_url)
 
 def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-# Run immediately
-init_db()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL
+            )
+        ''')
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print("Database initialization skipped or failed:", e)
 
 # =======================================================
 # 2. LOGIN & REGISTER
 # =======================================================
 @app.route('/api/register', methods=['POST'])
 def register():
+    # Make sure DB is initialized before first user registers
+    init_db() 
+    
     data = request.json
     email = data.get('email')
     password = data.get('password')
@@ -40,16 +55,17 @@ def register():
         return jsonify({"status": "error", "message": "Email and password required"})
 
     try:
-        conn = sqlite3.connect(DB_FILE)
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, password))
+        cursor.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, password))
         conn.commit()
         return jsonify({"status": "success", "message": "Registered successfully!"})
-    except sqlite3.IntegrityError:
+    except psycopg2.errors.UniqueViolation:
         return jsonify({"status": "error", "message": "Email already exists"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
     finally:
+        if 'cursor' in locals(): cursor.close()
         if 'conn' in locals(): conn.close()
 
 @app.route('/api/login', methods=['POST'])
@@ -59,19 +75,19 @@ def login():
     password = data.get('password')
 
     try:
-        conn = sqlite3.connect(DB_FILE)
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+        cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (email, password))
         user = cursor.fetchone()
         
         if user:
             return jsonify({"status": "success", "message": "Login successful!"})
         else:
             return jsonify({"status": "error", "message": "Invalid credentials"})
-            
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
     finally:
+        if 'cursor' in locals(): cursor.close()
         if 'conn' in locals(): conn.close()
 
 # =======================================================
@@ -107,6 +123,3 @@ def tools(tool_name):
         result = f"Executed tool [{tool_name}] on: {payload}"
         
     return jsonify({"status": "success", "result": result})
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
