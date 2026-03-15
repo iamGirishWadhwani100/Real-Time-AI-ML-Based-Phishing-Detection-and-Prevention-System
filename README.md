@@ -1,104 +1,94 @@
-**🛡️ Cyber Suite | Autonomous Detection Operations**
+🛡️ PhishNet Security Platform & J.A.R.V.I.S. AI
 
-Cyber Suite is a comprehensive, browser-native cybersecurity and forensic toolkit. Designed with a sleek, responsive retro-cyberpunk aesthetic, it provides advanced network analysis, cryptographic functions, and password security tools that run entirely on the client side.
+PhishNet is an advanced, Real-Time AI/ML-Based Cybersecurity and Phishing Prevention System. It is designed as an autonomous, multi-vector forensics web platform that allows operators to seamlessly investigate network traffic, analyze malicious files, decode cryptography, and gather threat intelligence.
 
-**🚀 Features**
+At the core of the platform is J.A.R.V.I.S., a fully integrated Natural Language Processing (NLP) AI Assistant. J.A.R.V.I.S. features dynamic voice synthesis, multi-language translation, and local memory, allowing operators to execute complex cybersecurity tools using simple conversational commands.
 
-The platform is divided into three core operational modules:
+🖥️ System Dashboard
 
-**🌐 Module 01: Network & Web Utilities**
+<p align="center">
+<img src="Screenshot 2026-03-14 at 18.34.16.jpg" width="800" alt="PhishNet Autonomous Operations Dashboard">
+</p>
 
-**URL Analyzer:** Performs static and heuristic analysis on suspicious links, simulating threat intelligence feed queries to generate a threat score.
+✨ Core Features & Modules
 
-**Domain Reputation:** Evaluates domains/IPs against common threat signatures, providing a detailed mock OSINT footprint (WHOIS, DNS, Reputation).
+The platform is divided into four primary cybersecurity modules, all accessible through a sleek, cyberpunk-inspired graphical user interface.
 
-**QR Code Scanner:** Safely uploads and decodes suspicious QR code images without executing the payload, utilizing the jsQR engine.
+1. 🌐 Phishing & Threat Intelligence
 
-**PCAP Analyzer:** Simulates deep packet inspection on uploaded .pcap/.pcapng files, generating detailed Wireshark-style forensic summaries.
+Real-Time URL Scanning: Analyzes suspicious links for phishing signatures.
 
-**🔐 Module 02: Cryptography**
+Deep IP Forensics: Conducts global threat scans to determine if an IP address is malicious.
 
-**Asymmetric Cryptography (RSA):** Generate 2048-bit RSA key pairs, and encrypt/decrypt messages natively using the browser's Web Crypto API. Keys are exported in standard SPKI and PKCS#8 formats.
+Domain Reputation OSINT: Gathers open-source intelligence on target domains.
 
-**Symmetric Encryption (AES-GCM):** Securely encrypt and decrypt payloads using AES-256-GCM. Includes automatic PBKDF2 key derivation, Salt, and IV generation.
+Secure QR Decoder: Safely extracts payloads from QR codes without executing them.
 
-**LSB Steganography:** Hide (inject) and reveal (extract) secret text payloads within the Least Significant Bits of the RGB channels of PNG images.
+2. 🖧 Network Utilities
 
-**🔑 Module 03: Password Toolkit**
+PCAP Packet Forensics: Upload network capture files (.pcap) for Deep Packet Inspection to uncover plaintext credentials and malicious traffic.
 
-**Secure Password Generator:** Generate highly secure, customized passwords locally using window.crypto.getRandomValues() (CSPRNG).
+Subnet & CIDR Operations: Instant network mapping and subnet calculations.
 
-**Strength Checker:** Calculates the exact Shannon Entropy and estimated brute-force resistance time of a given password.
+<p align="center">
+<img src="Screenshot 2026-03-07 at 19.47.32.jpg" width="800" alt="PCAP Packet Forensics">
+</p>
 
-**Breach Checker:** Queries the Have I Been Pwned database to see if a password has been compromised. Privacy First: Uses the k-Anonymity model—only the first 5 characters of a local SHA-1 hash are sent to the API. Your full password never leaves your device.
+3. 🔐 Cryptography & Passwords
 
-**🛠️ Technologies Used**
+RSA & AES-256 Engine: Industry-standard encryption and decryption tools.
 
-Frontend Framework: HTML5, Vanilla JavaScript, Tailwind CSS (via CDN).
+Base64 & Hex Converters: Rapidly encode or decode hidden payloads.
 
-Cryptography: Native browser Web Crypto API (No external servers required).
+HIBP Breach Verification: Check if specific passwords have been compromised in global data breaches.
 
-QR Decoding: jsQR (Client-side QR code reading).
+4. 🔬 Forensics Analysis
 
-Icons & Typography: FontAwesome 6, Google Fonts (Inter, Share Tech Mono).
+LSB Image Steganography: Hide or reveal secret text payloads inside image files.
 
-**🔒 Security & Privacy Notice**
+EXIF Metadata Forge: Extract or strip invisible metadata from photographs.
 
-This application is a 100% Client-Side Single Page Application (SPA). * Cryptographic keys (RSA/AES) are generated directly in your browser's memory.
+Binary String Extraction: Run a background web-worker to pull human-readable ASCII strings from raw binary malware.
 
-Data encrypted or decrypted via this tool never touches an external server.
+🤖 J.A.R.V.I.S. Artificial Intelligence Node
 
-The Password Breach tool hashes your password locally and uses the k-Anonymity privacy model, ensuring your actual password is never transmitted across the network.
+<p align="center">
+<img src="Screenshot 2026-03-14 at 18.34.56.jpg" width="800" alt="J.A.R.V.I.S AI Interface">
+</p>
 
-**💻 Getting Started**
+Instead of clicking through menus, operators can launch the J.A.R.V.I.S. Master Intelligence Node.
 
-Because Cyber Suite is a zero-dependency, static frontend application, installation is instantaneous.
+Conversational Execution: Type commands like "Scan IP 8.8.8.8" or "Check this URL" and J.A.R.V.I.S. will automatically route the payload to the Python backend.
 
-**Clone the repository:**
+Smart Autodetect: Upload a file to the chat, and J.A.R.V.I.S. will automatically determine the correct forensic protocol (e.g., recognizing a .pcap and running network analysis).
 
-git clone [https://github.com/yourusername/cyber-suite.git](https://github.com/yourusername/cyber-suite.git)
+Persistent Voice Memory: Select a custom TTS (Text-to-Speech) voice engine. The platform uses Local Storage to remember your preference for future sessions.
 
+Dynamic Translation: Integrates with Google Translate to dynamically translate terminal output and speak in your native language.
 
-**Navigate to the directory:**
+🔒 Secure SOC Authentication
 
-cd cyber-suite
+Access to the platform is restricted via a Secure SQLite Database Integration. Operators must register and authenticate through the Python backend before establishing a session.
 
+<p align="center">
+<img src="Screenshot 2026-03-15 at 15.13.00.jpg" width="400" alt="Secure SOC Login">
+<img src="Screenshot 2026-03-15 at 15.13.24.jpg" width="400" alt="Database Registration">
+</p>
 
-**Run the application:**
-Simply double-click the index.html file to open it in any modern web browser (Chrome, Firefox, Safari, Edge). No local server (like Node or Python) is required!
+🏗️ System Architecture
 
-**📸 Screenshots**
-<details>
-<summary>Click to view screenshots</summary>
+This project utilizes a modern Edge-to-Microservice Architecture:
 
-**Dashboard & UI**
-<img src="assets/dashboard.png" width="800" alt="Cyber Suite Dashboard">
+The Frontend (UI/UX): Built entirely with HTML5, JavaScript, and Tailwind CSS. It features a dynamic HTML5 Canvas matrix background and glass-morphism panels. It is fully static and designed to be hosted on GitHub Pages.
 
-**Cryptographic Operations**
-<img src="assets/Crypto_RSA.png" width="800" alt="RSA Cryptography">
-<img src="assets/Crypto_AES.png" width="800" alt="AES Cryptography">
+The Backend (API & Brain): Powered by Python 3 and Flask. The backend handles database routing, natural language intent recognition, and API requests to external threat databases. It utilizes gunicorn for production deployment and is designed to be hosted on cloud services like Render.
 
-**Password Toolkit**
-<img src="assets/Password_Gen.png" width="800" alt="Password Generator">
-<img src="assets/Password_Breach.png" width="800" alt="Password Breach Checker">
+👨‍💻 Developer Communications
 
-</details>
+Engineered & Developed by Girish Wadhwani
 
-**🤝 Contributing**
+If you have questions, encounter roadblocks, or wish to initiate a secure handshake regarding this project, feel free to reach out:
 
-Contributions, issues, and feature requests are welcome!
-Feel free to check the issues page if you want to contribute.
+✉️ Email: girishwadhwani1000@gmail.com
 
-Fork the Project
-
-Create your Feature Branch (git checkout -b feature/AmazingFeature)
-
-Commit your Changes (git commit -m 'Add some AmazingFeature')
-
-Push to the Branch (git push origin feature/AmazingFeature)
-
-Open a Pull Request
-
-**📄 License**
-
-Distributed under the MIT License. See LICENSE for more information.
+📱 WhatsApp: +91 9664380661
