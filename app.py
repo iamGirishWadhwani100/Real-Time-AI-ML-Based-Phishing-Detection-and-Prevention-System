@@ -11,13 +11,13 @@ CORS(app)
 # 1. VERCEL & NEON POSTGRES DATABASE SETUP
 # =======================================================
 def get_db_connection():
-    # Vercel and Neon automatically inject DATABASE_URL in the background
-    db_url = os.environ.get('DATABASE_URL')
+    # We changed this to POSTGRES_URL to match your Vercel screenshot!
+    db_url = os.environ.get('POSTGRES_URL')
     
     if not db_url:
-        raise Exception("Database URL not found! Make sure Neon is connected to the Vercel project.")
+        raise Exception("Database URL not found!")
     
-    # Python's database drivers require 'postgresql://' instead of 'postgres://'
+    # Python requires 'postgresql://' instead of 'postgres://'
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
         
