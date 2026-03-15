@@ -1,22 +1,23 @@
 import os
+import hashlib
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import psycopg2
-import hashlib
 
 app = Flask(__name__)
 CORS(app)
 
 # =======================================================
-# 1. VERCEL BUILT-IN POSTGRES DATABASE
+# 1. VERCEL & NEON POSTGRES DATABASE SETUP
 # =======================================================
-# Vercel automatically provides this URL securely in the background!
 def get_db_connection():
-    db_url = os.environ.get('POSTGRES_URL')
-    if not db_url:
-        raise Exception("Database URL not found! Make sure you created Vercel Postgres in the Storage tab.")
+    # Vercel and Neon automatically inject DATABASE_URL in the background
+    db_url = os.environ.get('DATABASE_URL')
     
-    # Vercel Postgres sometimes requires 'postgresql://' instead of 'postgres://'
+    if not db_url:
+        raise Exception("Database URL not found! Make sure Neon is connected to the Vercel project.")
+    
+    # Python's database drivers require 'postgresql://' instead of 'postgres://'
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
         
@@ -26,6 +27,7 @@ def init_db():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        # Create the users table if it doesn't exist
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
@@ -36,15 +38,19 @@ def init_db():
         conn.commit()
         cursor.close()
         conn.close()
+        print("Neon Database initialized successfully!")
     except Exception as e:
-        print("Database initialization skipped or failed:", e)
+        print("Database error during initialization:", e)
+
+# Run initialization
+init_db()
 
 # =======================================================
-# 2. LOGIN & REGISTER
+# 2. AUTHENTICATION ROUTES (Login & Sign Up)
 # =======================================================
 @app.route('/api/register', methods=['POST'])
 def register():
-    # Make sure DB is initialized before first user registers
+    # Double-checking the table exists just in case
     init_db() 
     
     data = request.json
@@ -91,7 +97,7 @@ def login():
         if 'conn' in locals(): conn.close()
 
 # =======================================================
-# 3. J.A.R.V.I.S. & TOOLS
+# 3. J.A.R.V.I.S. & CYBERSECURITY TOOLS
 # =======================================================
 @app.route('/api/jarvis', methods=['POST'])
 def jarvis():
@@ -123,3 +129,7 @@ def tools(tool_name):
         result = f"Executed tool [{tool_name}] on: {payload}"
         
     return jsonify({"status": "success", "result": result})
+
+# Used for local testing, Vercel ignores this
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
