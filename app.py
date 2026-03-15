@@ -12,7 +12,7 @@ CORS(app)
 # =======================================================
 
 # Using your new alphanumeric password
-DB_URL = "postgresql://postgres:PhishNet2026@db.chzaiuezgmarwjbraobe.supabase.co:5432/postgres"
+DB_URL = "postgresql://postgres:PhishNet2026@db.chzaiuezgmarwjbraobe.supabase.co:6543/postgres"
 
 def get_db_connection():
     return psycopg2.connect(DB_URL)
