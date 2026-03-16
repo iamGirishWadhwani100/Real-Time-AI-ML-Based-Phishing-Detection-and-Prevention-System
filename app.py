@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # --- SUPABASE CONNECTION ---
-url = os.environ.get("jthkrwgqkdhdkwfqgjdq")
+url = os.environ.get("https://jthkrwgqkdhdkwfqgjdq.supabase.co")
 key = os.environ.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aGtyd2dxa2RoZGt3ZnFnamRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2Njc4NzAsImV4cCI6MjA4OTI0Mzg3MH0.uyMvzZk02UhcgTbyZ7c864LoTVmlCDIK9vcn3M3DGm4")
 
 supabase: Client = None
