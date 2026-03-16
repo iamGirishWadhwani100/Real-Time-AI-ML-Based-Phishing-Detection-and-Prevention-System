@@ -21,18 +21,32 @@ if url and key:
 # --- AUTH ROUTES ---
 @app.route('/api/register', methods=['POST'])
 def register():
-    if not supabase: return jsonify({"status": "error", "message": "Database not connected."})
+    # --- NEW DEBUG DETECTIVE CODE ---
+    if not supabase:
+        u = os.environ.get("SUPABASE_URL")
+        k = os.environ.get("SUPABASE_KEY")
+        
+        # This will print the exact issue to your website screen!
+        debug_msg = f"DB Error! URL found: {'YES' if u else 'NO'} | Key found: {'YES' if k else 'NO'}"
+        return jsonify({"status": "error", "message": debug_msg})
+    # --------------------------------
+
     data = request.json
-    email, password = data.get('email'), data.get('password')
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({"status": "error", "message": "Email and password required"})
 
     try:
         existing = supabase.table('users').select('*').eq('email', email).execute()
-        if len(existing.data) > 0: return jsonify({"status": "error", "message": "Email already exists"})
-        
+        if len(existing.data) > 0:
+            return jsonify({"status": "error", "message": "Email already exists"})
+
         supabase.table('users').insert({"email": email, "password": password}).execute()
         return jsonify({"status": "success", "message": "Registered successfully!"})
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+        return jsonify({"status": "error", "message": f"Supabase rejected it: {str(e)}"})
 
 @app.route('/api/login', methods=['POST'])
 def login():
