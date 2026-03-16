@@ -323,7 +323,7 @@
             }
             
             try {
-                const response = await fetch('/api/jarvis', {
+                const response = await fetch('https://real-time-ai-ml-based-phishing-detection-bgw1.onrender.com/api/jarvis', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: text })
                 });
                 const aiData = await response.json();
@@ -331,7 +331,7 @@
                 if(aiData.intent === 'ip_scan' || aiData.intent === 'url' || aiData.intent.startsWith('conv_') || aiData.intent === 'hash') {
                     const out = appendMessage("Jarvis", `<span class="text-cyan-muted">[*] Transmitting payload to Phish-Net Backend (${aiData.intent})...</span>\n`, 'terminal');
                     speakText(aiData.speech);
-                    const res = await fetch(`/api/tool/${aiData.intent}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payload: aiData.target }) });
+                    const res = await fetch(`https://real-time-ai-ml-based-phishing-detection-bgw1.onrender.com/api/tool/${aiData.intent}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payload: aiData.target }) });
                     const data = await res.json();
                     if (data.status === 'success') out.innerHTML += `\n<span class="text-green-muted">[+] BACKEND EXECUTED SUCCESSFULLY:</span>\n${data.result}`;
                 } else {
